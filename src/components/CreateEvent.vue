@@ -98,4 +98,11 @@ export default {
   background-color: #ffffff;
   border: 1px solid #cccccc;
 }
+
+.toast {
+  padding: 30px 80px;
+  background-color: #302e2e;
+}
+
+
 </style>

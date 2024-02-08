@@ -11,9 +11,11 @@
                 </button>
             </div>
         </div>
-        <div class="maintoast" v-if="showT">
-            <CreateEvent @close="closeToast" @create-event="handleFormSubmitted" />
-        </div>
+        <Teleport to="body" v-if="showT">
+            <div class="maintoast">
+                <CreateEvent @close="closeToast" @create-event="handleFormSubmitted" />
+            </div>
+        </Teleport>
         <div>
             <VCalendar :attributes="attrs" is-dark="{}" class="cal"/>
         </div>
@@ -126,12 +128,18 @@ export default {
     justify-content: center;
     align-items: center;
     margin: auto;
-    max-width: 310px;
-    width:100%;
+    /* max-width: 310px; */
     padding: 10px 0;
     background: #dde1e7;
     box-shadow: -3px -3px 7px #ffffff73,
                2px 2px 5px rgba(94,104,121,0.288);
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background-color: rgba(0, 0, 0, 0.5);
+  z-index: 9999; 
 }
 
 .nav{
@@ -193,7 +201,9 @@ export default {
     padding-top: 10px;
     font-weight: 500;
     font-size: 1.3rem;
-    text-align: center;
+    text-align: left;
+    color: #5096ff;
+    text-shadow: 1px 1px 2px beige;
 }
 
 .closeSymbol{
@@ -204,6 +214,7 @@ export default {
     position: absolute;
     top: 10px;
     right: 0;
+    color: #dde1e7;
     background-color: #00000000;
 }
 
@@ -217,6 +228,7 @@ export default {
     border: none;
     font-size: 1.2rem;
     text-align: center;
+    text-shadow: 0.5px 0 1px beige;
 }
 
 .modfield{
