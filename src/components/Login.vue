@@ -66,6 +66,10 @@ import axios from "axios";
                })
                //const data = await response.data;
                console.log(response.data);
+               //if (response.data.success) {
+               // Store email in cookie
+               this.$cookies.set('email', response.data.email, { expires: '1d' });
+               
                this.$router.push('/home');
             } catch (e) {
                console.log(e)

@@ -4,6 +4,7 @@
             <h2><span  class="fas fa-solid fa-calendar" style="margin-right: 8px;"></span>Calender</h2>
             <!-- <span class="fas fa-sharp fa-regular fa-list" style="margin-right: 8px;"></span> -->
             <div class="navright">
+                <button class="createEvent" @click="getEmail">Email</button>
                 <button class="createEvent" @click="showToast">Create Event</button>
                 <button @click="logout">
                 <div v-show="!isLarge" class="createEvent">Logout</div>
@@ -65,23 +66,32 @@ export default {
             isAuthenticated: false,
             showT: false,
             isLarge: true,
+            cookieEmail: '',
         }
     },
-    computed(){
-        if(window.innerWidth < 600){
-            this.isLarge = false
-        };
+    computed:{
+        // if(window.innerWidth < 600){
+        //     this.isLarge = false
+        // }
+        isLoggedIn() {
+            return VueCookies.isKey('email');
+        }
     },
 
     methods: {
         async logout() {
             const response = await axios.post('http://localhost:3000/logout')
                 .then(() => {
+                    this.$cookies.remove('email');
                     this.$router.push('/login')
                 }).catch((e) => {
                     console.log("hi",response,"hi")
                     console.log(e)
                 })
+        },
+        getEmail(){
+            this.cookieEmail = this.$cookies.get('email');
+            console.log("home pe", this.cookieEmail)
         },
         // triggerToast() {
         //     this.toast("Hi from LogRocket", {
