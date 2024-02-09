@@ -68,9 +68,9 @@ export default {
         }
     },
     computed(){
-            if(window.innerWidth < 600){
-                this.isLarge = false
-            };
+        if(window.innerWidth < 600){
+            this.isLarge = false
+        };
     },
 
     methods: {
