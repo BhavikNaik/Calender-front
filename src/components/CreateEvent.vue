@@ -1,5 +1,5 @@
 <template>
-    <div class="toast">
+    <div class="toasti">
         <form @submit.prevent="handleSubmit">
             <div class="topi">
                 <span class="norText">
@@ -43,9 +43,48 @@ export default {
             endTime: '',
             emailsInput: '',
             mails: [],
+            host:'',
+            titleError: '',
+            startTimeError: '',
+            endTimeError: '',
         }
     },
+    async mounted(){
+        try {
+            const response = await axios.get('http://localhost:3000/home',{  withCredentials: true });
+            this.host = response.data.id; // This will contain information about the currently logged-in user
+        } catch (error) {
+            console.error("errrr",error);
+        }
+        // this.host = userData;
+        // await this.getMail();
+    },
     methods: {
+        validateTitle() {
+            // const emailRegex = /^[a-zA-Z0-9._-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,6}$/;
+            if(this.ename.length < 1) {
+               //alert('Invalid email address');
+               this.titleError=false;
+            } else{
+               this.titleError=true;
+            }
+         },
+         validateStartTime() {
+            if(this.startTime.length < 6) {
+               //alert('Password must be at least 6 characters');
+               this.startTimeError=false;
+            } else{
+               this.startTimeError=true;
+            }
+         },
+         validateEndTime() {
+            if(this.endTime.length < 6) {
+               //alert('Password must be at least 6 characters');
+               this.endTimeError=false;
+            } else{
+               this.endTimeError=true;
+            }
+         },
         addEmail() {
             // Trim the input value and split it by commas to get multiple email addresses
             const newEmails = this.emailsInput.trim().split(',');
@@ -61,23 +100,50 @@ export default {
             // Clear the input field
             this.emailsInput = '';
         },
+        // getEmail(){
+        //     this.host = this.$cookies.get('email');
+        // },
         async handleSubmit() {
-            console.log("handling submit")
-            
+            this.validateTitle();
+            this.validateStartTime();
+            this.validateEndTime();
+
+            if (!this.titleError) {
+               alert('Title cannot be Empty !!');
+               return;
+            }
+            if (!this.startTimeError) {
+               alert('Start time should be mentioned');
+               return;
+            }
+            if (!this.endTimeError) {
+               alert('End time should be mentioned');
+               return;
+            }
+
             this.addEmail();
+
+            const startDate = new Date(this.startTime);
+            startDate.setHours(startDate.getHours() + 5, startDate.getMinutes() + 30);
+
+            // Convert end time to IST
+            const endDate = new Date(this.endTime);
+            endDate.setHours(endDate.getHours() + 5, endDate.getMinutes() + 30);
+            // this.getEmail();
             console.log('Form: ', this.ename,"",this.description,"",this.startTime,"",this.endTime,"",this.mails,"",this.host);
             try {
-                const response = await axios.post('http://localhost:3000/create-event', {
+                const response = await axios.post(`http://localhost:3000/create-event`, {
                     title: this.ename,
                     description: this.description,
-                    startTime: this.startTime,
-                    endTime: this.endTime,
+                    startDate: startDate,
+                    endDate: endDate,
                     emails: this.mails,
                     host: this.host,
-                });
+                },{withCredentials: true});
                 console.log('Event created:', response.data);
-
                 this.$emit('create-event', response.data);
+                this.mails = [];
+                this.emails ='';
                 this.$emit('close');
             } catch (error) {
                 console.error('Error creating event:', error);
@@ -99,8 +165,8 @@ export default {
   border: 1px solid #cccccc;
 }
 
-.toast {
-  padding: 30px 80px;
+.toasti {
+  padding: 30px 50px;
   background-color: #302e2e;
 }
 

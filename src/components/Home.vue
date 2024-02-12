@@ -1,14 +1,15 @@
 <template>
     <div>
         <div class="nav">
-            <h2><span  class="fas fa-solid fa-calendar" style="margin-right: 8px;"></span>Calender</h2>
+            <h2 style="display: flex;flex-wrap: nowrap;"><span  class="fas fa-solid fa-calendar" style="margin-right: 8px;"></span>Calender</h2>
             <!-- <span class="fas fa-sharp fa-regular fa-list" style="margin-right: 8px;"></span> -->
             <div class="navright">
-                <button class="createEvent" @click="getEmail">Email</button>
+                <button class="createEvent" @click="getEvents">Get Events</button>
+                <!-- <button class="createEvent" @click="ifAuth">Email</button> -->
                 <button class="createEvent" @click="showToast">Create Event</button>
                 <button @click="logout">
-                <div v-show="!isLarge" class="createEvent">Logout</div>
-                <div v-show="isLarge" class="logout"><img src="../assets/logout.png" style="max-width:30px;max-height: 20px;padding: 0;"/></div>
+                <!-- <div v-show="!isLarge" class="createEvent">Logout</div> -->
+                    <div class="logout"><img src="../assets/logout.png" style="max-width:30px;max-height: 20px;padding: 0;"/></div>
                 </button>
             </div>
         </div>
@@ -17,8 +18,26 @@
                 <CreateEvent @close="closeToast" @create-event="handleFormSubmitted" />
             </div>
         </Teleport>
-        <div>
-            <VCalendar :attributes="attrs" is-dark="{}" class="cal"/>
+        <div class="calboth">
+            <div class="leftCal">
+                <VCalendar :attributes="attrs" is-dark="{}" class="cal"/>
+                <div class="dropdown">
+                    <div style="display: flex;justify-content: space-between; padding: 5px;">
+                        <div>Invitations</div>
+                        <div><button @click="toggleDropdown">V</button></div>
+                    </div>
+                    <!-- <div v-if="isOpen" class="dropdown-content"> -->
+                    <div v-if="isOpen" v-for="invitation in invitations" :key="invitation.id" class="dropdown-content">
+                        <div class="inner-content">
+                            <div>{{invitation.title}}</div>
+                            <!-- <div>{{invitation.startTime}} - {{invitation.endTime}}</div>
+                            <div>Invited by: {{invitation.host}}</div> -->
+                        </div>
+                    </div>
+                    <!-- </div> -->
+                </div>
+            </div>
+            <Calender class="calendar"/>
         </div>
     </div>
 </template>
@@ -33,7 +52,7 @@ import axios from 'axios';
 export default {
     components: {
         CreateEvent,
-        // Calender
+        Calender
     },
     setup(){
         const attrs = ref([
@@ -66,33 +85,79 @@ export default {
             isAuthenticated: false,
             showT: false,
             isLarge: true,
-            cookieEmail: '',
+            userId: '',
+            isOpen: false,
+            invitations: [
+                { id: 1, title: 'Invitation 1' },
+                { id: 2, title: 'Invitation 2Invitation 2Invitation 2Invitation 2' },
+                { id: 3, title: 'Invitation 3' }
+            ]
         }
     },
-    computed:{
-        // if(window.innerWidth < 600){
-        //     this.isLarge = false
-        // }
-        isLoggedIn() {
-            return VueCookies.isKey('email');
+    // computed:{
+    //     // if(window.innerWidth < 600){
+    //     //     this.isLarge = false
+    //     // }
+    //     isLoggedIn() {
+    //         return VueCookies.isKey('email');
+    //     }
+    // },
+    async mounted() {
+        try {
+            const response = await axios.get('http://localhost:3000/home',{  withCredentials: true });
+            const userData = response.data;
+            console.log(userData); // This will contain information about the currently logged-in user
+            this.userId = response.data._id;
+            // console.log(this.userId);
+        } catch (error) {
+            console.error("errrr",error);
         }
     },
 
     methods: {
+        toggleDropdown() {
+            this.isOpen = !this.isOpen;
+        },
         async logout() {
-            const response = await axios.post('http://localhost:3000/logout')
-                .then(() => {
-                    this.$cookies.remove('email');
-                    this.$router.push('/login')
-                }).catch((e) => {
-                    console.log("hi",response,"hi")
-                    console.log(e)
-                })
+            // await axios.post('http://localhost:3000/logout', { withCredentials: true })
+            //     .then((response) => {
+            //         // this.$cookies.remove('email');
+            //         console.log(response.data);
+            //         this.$router.push('/login')
+            //     }).catch((e) => {
+            //         console.log("hi",e,"hi")
+            //     })
+            try {
+                const response = await axios.post('http://localhost:3000/logout', null, {  withCredentials: true });
+                const userData = response.data;
+                console.log(userData);
+                this.$router.push('/login')
+            } catch (error) {
+                console.error("errrr",error);
+            }
         },
-        getEmail(){
-            this.cookieEmail = this.$cookies.get('email');
-            console.log("home pe", this.cookieEmail)
+        // async ifAuth(){
+        //     try {
+        //         const response = await axios.get('http://localhost:3000/home',{  withCredentials: true });
+        //         const userData = response.data;
+        //         console.log(userData); // This will contain information about the currently logged-in user
+        //     } catch (error) {
+        //         console.error("errrr",error);
+        //     }
+        // },
+        async getEvents(){
+            try {
+                const response = await axios.post('http://localhost:3000/get-events', { id:this.userId }, {  withCredentials: true });
+                const userData = response.data.eventInvitations;
+                console.log(userData); // This will contain information about the currently logged-in user
+            } catch (error) {
+                console.error("errrr",error);
+            }
         },
+        // getEmail(){
+        //     this.cookieEmail = this.$cookies.get('email');
+        //     console.log("home pe", this.cookieEmail)
+        // },
         // triggerToast() {
         //     this.toast("Hi from LogRocket", {
         //         position: "top-center",
@@ -143,13 +208,13 @@ export default {
     background: #dde1e7;
     box-shadow: -3px -3px 7px #ffffff73,
                2px 2px 5px rgba(94,104,121,0.288);
-  position: fixed;
-  top: 0;
-  left: 0;
-  width: 100%;
-  height: 100%;
-  background-color: rgba(0, 0, 0, 0.5);
-  z-index: 9999; 
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background-color: rgba(0, 0, 0, 0.5);
+    z-index: 9999; 
 }
 
 .nav{
@@ -177,9 +242,16 @@ export default {
     color: #e9eaf0;
 }
 
+.leftCal{
+    display: flex;
+    /* justify-content: center;
+    align-items: center; */
+    flex-direction: column;
+}
+
 .createEvent{
     margin: 0 10px;
-  max-width: 350px;
+  max-width: 450px;
   padding: 10px 16px;
   font-size: 1.1rem;
   font-weight: 500;
@@ -198,6 +270,19 @@ export default {
     border: none;
     outline: none;
     box-shadow: 4px 4px 8px rgba(24, 34, 50, 0.288),0px 0px 2px #ffffff73;
+}
+
+.calboth{
+    display: flex;
+    flex-wrap: wrap;
+    /* justify-content: space-; */
+    /* align-items: center; */
+}
+
+.calendar {
+  flex: 1;
+  margin: 0 25px;
+  max-height: 640px;
 }
 
 .topi {
@@ -233,8 +318,8 @@ export default {
     margin: 10px auto;
     padding: 8px 20px;
     color: #000000;
-    font-weight: 400;
-    background-color: rgba(0, 60, 255, 0.825);
+    font-weight: 700;
+    background-color: rgba(22, 71, 231, 0.918);
     border: none;
     font-size: 1.2rem;
     text-align: center;
@@ -244,9 +329,10 @@ export default {
 .modfield{
   height: 50px;
   width: 100%;
+  min-width: 270px;
   display: flex;
   position: relative;
-  margin: 15px 0;
+  margin: 15px 0 25px 0;
 }
 
 .modfield input{
@@ -272,5 +358,49 @@ export default {
 .cal{
     margin-left: 10px;
 }
+
+.dropdown {
+  display: flex;
+  flex-direction: column;
+  border: 2px solid black;
+  max-width: 250px;
+  margin-left: 10px;
+  margin-top: 10px;
+}
+
+.dropdown-content {
+  display: flex;
+  flex-direction: row;
+  /* position: absolute; */
+  background-color: #f9f9f9;
+  min-width: 150px;
+  max-height: 200px; /* Set maximum height */
+  overflow-y: auto; /* Enable vertical scrollbar */
+  z-index: 1;
+}
+
+.inner-content {
+    display: flex;
+    flex-direction: column;
+    padding: 10px;
+    border: 2px solid #3f0a0a;
+}
+
+/* .dropdown-content button {
+  width: 100%;
+  padding: 8px 12px;
+  text-align: left;
+  border: none;
+  background-color: transparent;
+  cursor: pointer;
+} */
+
+/* .dropdown-content button:hover {
+  background-color: #ddd;
+}
+
+.dropdown:hover .dropdown-content {
+  display: block;
+} */
 
 </style>

@@ -63,12 +63,12 @@ import axios from "axios";
                const response = await axios.post(`http://localhost:3000/login`, {
                   email: this.mail,
                   password: this.password,
-               })
+               },{  withCredentials: true })
                //const data = await response.data;
                console.log(response.data);
                //if (response.data.success) {
                // Store email in cookie
-               this.$cookies.set('email', response.data.email, { expires: '1d' });
+               // this.$cookies.set('email', response.data.email, { expires: '1d' });
                
                this.$router.push('/home');
             } catch (e) {
@@ -90,10 +90,9 @@ import axios from "axios";
                return;
             }
 
-            console.log(this.mail, "", this.password);
+            // console.log(this.mail, "", this.password);
 
             this.loginCheck();
-            console.log('Form submitted!');
             //this.$router.push('/home');
             
          },
