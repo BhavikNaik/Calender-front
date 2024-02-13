@@ -44,6 +44,7 @@ export default {
             emailsInput: '',
             mails: [],
             host:'',
+            ownmail: '',
             titleError: '',
             startTimeError: '',
             endTimeError: '',
@@ -51,8 +52,9 @@ export default {
     },
     async mounted(){
         try {
-            const response = await axios.get('http://localhost:3000/home',{  withCredentials: true });
+            const response = await axios.get('http://localhost:3000/api/home',{  withCredentials: true });
             this.host = response.data.id; // This will contain information about the currently logged-in user
+            this.ownmail = response.data.email;
         } catch (error) {
             console.error("errrr",error);
         }
@@ -92,7 +94,7 @@ export default {
             // Loop through the new email addresses and add them to the existing array
             newEmails.forEach(email => {
                 const trimmedEmail = email.trim();
-                if (trimmedEmail) {
+                if (trimmedEmail && trimmedEmail != this.ownmail) {
                     this.mails.push(trimmedEmail);
                 }
             });
@@ -132,7 +134,7 @@ export default {
             // this.getEmail();
             console.log('Form: ', this.ename,"",this.description,"",this.startTime,"",this.endTime,"",this.mails,"",this.host);
             try {
-                const response = await axios.post(`http://localhost:3000/create-event`, {
+                const response = await axios.post(`http://localhost:3000/api/create-event`, {
                     title: this.ename,
                     description: this.description,
                     startDate: startDate,

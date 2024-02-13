@@ -22,22 +22,28 @@
             <div class="leftCal">
                 <VCalendar :attributes="attrs" is-dark="{}" class="cal"/>
                 <div class="dropdown">
-                    <div style="display: flex;justify-content: space-between; padding: 5px;">
+                    <div style="display: flex;justify-content: space-between; padding: 5px 10px;font-size: 1.2rem;">
                         <div>Invitations</div>
                         <div><button @click="toggleDropdown">V</button></div>
                     </div>
                     <!-- <div v-if="isOpen" class="dropdown-content"> -->
-                    <div v-if="isOpen" v-for="invitation in invitations" :key="invitation.id" class="dropdown-content">
-                        <div class="inner-content">
-                            <div>{{invitation.title}}</div>
-                            <!-- <div>{{invitation.startTime}} - {{invitation.endTime}}</div>
-                            <div>Invited by: {{invitation.host}}</div> -->
+                    <div class="inner-scroll">
+                        <div v-if="isOpen" v-for="invitation in invitations" class="dropdown-content" v-on:click="handleSelect(invitation)">
+                            <div class="inner-content">
+                                <div>Title: {{invitation.title}}</div>
+                                <div>Start Time: {{invitation.start}}</div>
+                                <div>End Time: {{invitation.end}}</div>
+                                <div>Invited by: {{invitation.host}}</div>
+                                <div class="buttons">
+                                    <button class="inner-buttons" @click="submitYes(invitation.id)">Yes</button>
+                                    <button class="inner-buttons" @click="submitNo(invitation.id)">No</button>
+                                    <button class="inner-buttons" @click="submitMaybe(invitation.id)">Maybe</button></div>
+                            </div>
                         </div>
                     </div>
-                    <!-- </div> -->
                 </div>
             </div>
-            <Calender class="calendar"/>
+            <Calender class="calendar" v-if="renderComponent"/>
         </div>
     </div>
 </template>
@@ -46,35 +52,13 @@
 // import { useToast } from "vue-toastification";
 import CreateEvent from './CreateEvent.vue'
 import Calender from "./Calender.vue";
-import { ref } from 'vue';
+import { nextTick, ref, onMounted } from 'vue';
 import axios from 'axios';
 
 export default {
     components: {
         CreateEvent,
         Calender
-    },
-    setup(){
-        const attrs = ref([
-        {
-            key: 'today',
-            highlight: true,
-            dates: new Date(),
-        },
-        {
-            dot: 'red',
-            dates: [
-                new Date(2024, 1, 4),
-                new Date(2024, 1, 10),
-                new Date(2024, 1, 15),
-                new Date(2024, 1, 15),
-            ],
-        },
-        ]);
-        return{
-            attrs,
-            // showT: ref(false)
-        }
     },
     // setup() {
     //     const toast = useToast();
@@ -87,11 +71,11 @@ export default {
             isLarge: true,
             userId: '',
             isOpen: false,
-            invitations: [
-                { id: 1, title: 'Invitation 1' },
-                { id: 2, title: 'Invitation 2Invitation 2Invitation 2Invitation 2' },
-                { id: 3, title: 'Invitation 3' }
-            ]
+            invitations: [],
+            eventstarts: [],
+            attrs: [],
+            selectItem:'',
+            renderComponent: true,
         }
     },
     // computed:{
@@ -104,19 +88,48 @@ export default {
     // },
     async mounted() {
         try {
-            const response = await axios.get('http://localhost:3000/home',{  withCredentials: true });
+            const response = await axios.get('http://localhost:3000/api/home',{  withCredentials: true });
             const userData = response.data;
             console.log(userData); // This will contain information about the currently logged-in user
             this.userId = response.data._id;
+            await this.getInvitations();
+            await this.getEvents();
+            this.attrs = [
+            {
+                key: 'today',
+                highlight: true,
+                dates: new Date(),
+            },
+            {
+                dot: 'red',
+                dates: this.eventstarts.map(invitation => invitation.start)
+            }];
+            // console.log("as",this.invitestarts);
+            // console.log("ye",JSON.parse(JSON.stringify(this.invitestarts)));
+            // console.log("as",this.attrs);
             // console.log(this.userId);
         } catch (error) {
             console.error("errrr",error);
         }
-    },
 
+            // // Remove MyComponent from the DOM
+            // this.renderComponent = false;
+
+            // // Then, wait for the change to get flushed to the DOM
+            // await this.$nextTick();
+
+            // // Add MyComponent back in
+            // this.renderComponent = true;
+        
+    },
     methods: {
         toggleDropdown() {
             this.isOpen = !this.isOpen;
+        },
+        handleSelect(invitation) {
+            // console.log(invitation);
+            this.selectItem = invitation.id;
+            console.log(this.selectItem);
         },
         async logout() {
             // await axios.post('http://localhost:3000/logout', { withCredentials: true })
@@ -128,7 +141,7 @@ export default {
             //         console.log("hi",e,"hi")
             //     })
             try {
-                const response = await axios.post('http://localhost:3000/logout', null, {  withCredentials: true });
+                const response = await axios.post('http://localhost:3000/auth/logout', null, {  withCredentials: true });
                 const userData = response.data;
                 console.log(userData);
                 this.$router.push('/login')
@@ -147,9 +160,88 @@ export default {
         // },
         async getEvents(){
             try {
-                const response = await axios.post('http://localhost:3000/get-events', { id:this.userId }, {  withCredentials: true });
-                const userData = response.data.eventInvitations;
-                console.log(userData); // This will contain information about the currently logged-in user
+                const response = await axios.get(`http://localhost:3000/api/get-events`, {  withCredentials: true });
+                const userData = response.data;
+                console.log(userData);
+                userData.forEach(item => {
+                    // Push each item into the events array
+                    let datePart = item.startDate.slice(0, 10);
+                    let timePart = item.startDate.slice(11, 16);
+                    let dateTimeString = `${datePart} ${timePart}`;
+                    this.stime = dateTimeString;
+
+                    this.eventstarts.push({
+                        start: this.stime.slice(0,10),
+                    });
+                });
+
+            } catch (error) {
+                console.error("errrr",error);
+            }
+        },
+        async getInvitations(){
+            try {
+                const response = await axios.get(`http://localhost:3000/api/invitations`, {  withCredentials: true });
+                const userData = response.data;
+                console.log(userData); 
+                this.invitations = [];
+
+                userData.forEach(item => {
+                    // Push each item into the events array
+                    let datePart = item.startDate.slice(0, 10);
+                    let timePart = item.startDate.slice(11, 16);
+                    let dateTimeString = `${datePart} ${timePart}`;
+                    this.stime = dateTimeString;
+                    datePart = item.endDate.slice(0, 10);
+                    timePart = item.endDate.slice(11, 16);
+                    dateTimeString = `${datePart} ${timePart}`;
+                    this.etime = dateTimeString;
+                    console.log(this.stime, this.etime)
+
+                    this.invitations.push({
+                        title: item.title,
+                        start: this.stime,
+                        end: this.etime,
+                        host: item.host,
+                        id: item._id,
+                    });
+
+                    // this.invitestarts.push({
+                    //     start: this.stime.slice(0,10),
+                    // });
+                });
+                // console.log("thid",this.invitestarts);
+
+            } catch (error) {
+                console.error("errrr",error);
+            }
+        },
+        async submitYes(Id){
+            try {
+                const response = await axios.post(`http://localhost:3000/api/rsvp/${Id}`, {status:"accept"}, {  withCredentials: true });
+                const userData = response.data;
+                console.log(userData); 
+                this.getInvitations();
+            } catch (error) {
+                console.error("errrr",error);
+            }
+        },
+        async submitNo(Id){
+            try {
+                const response = await axios.post(`http://localhost:3000/api/rsvp/${Id}`, {status:"decline"}, {  withCredentials: true });
+                const userData = response.data;
+                console.log(userData); 
+                this.getInvitations();
+            } catch (error) {
+                console.error("errrr",error);
+            }
+        },
+        async submitMaybe(Id){
+            try {
+                const response = await axios.post(`http://localhost:3000/api/rsvp/${Id}`, {status:"maybe"}, {  withCredentials: true });
+                const userData = response.data;
+                console.log(userData); 
+                this.getInvitations();
             } catch (error) {
                 console.error("errrr",error);
             }
@@ -356,26 +448,33 @@ export default {
   margin-left: 15px;
 }
 .cal{
-    margin-left: 10px;
+    margin-left: 20px;
+    min-width: 300px;
 }
 
 .dropdown {
   display: flex;
   flex-direction: column;
   border: 2px solid black;
-  max-width: 250px;
-  margin-left: 10px;
+  max-width: 300px;
+  margin-left: 20px;
   margin-top: 10px;
+}
+
+.inner-scroll{
+    max-height: 320px;
+  overflow-y: auto;
+
 }
 
 .dropdown-content {
   display: flex;
   flex-direction: row;
   /* position: absolute; */
-  background-color: #f9f9f9;
+  background-color: #e7e6e6;
   min-width: 150px;
   max-height: 200px; /* Set maximum height */
-  overflow-y: auto; /* Enable vertical scrollbar */
+  /* overflow-y: auto; Enable vertical scrollbar */
   z-index: 1;
 }
 
@@ -384,6 +483,17 @@ export default {
     flex-direction: column;
     padding: 10px;
     border: 2px solid #3f0a0a;
+}
+.buttons{
+    display: flex;
+    justify-content: space-evenly;
+    margin-top: 10px;
+}
+
+.inner-buttons {
+    padding: 4px 7px;
+    background-color: #0066ff;
+    color: white;
 }
 
 /* .dropdown-content button {

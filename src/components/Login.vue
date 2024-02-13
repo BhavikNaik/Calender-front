@@ -60,7 +60,7 @@ import axios from "axios";
             //    return;
             // }
             try {
-               const response = await axios.post(`http://localhost:3000/login`, {
+               const response = await axios.post(`http://localhost:3000/auth/login`, {
                   email: this.mail,
                   password: this.password,
                },{  withCredentials: true })

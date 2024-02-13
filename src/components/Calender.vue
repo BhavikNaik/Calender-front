@@ -29,7 +29,7 @@ export default {
     },
     async mounted() {
         try {
-            const response = await axios.get('http://localhost:3000/home',{  withCredentials: true });
+            const response = await axios.get('http://localhost:3000/api/home',{  withCredentials: true });
             // const userData = response.data;
             // console.log(userData); // This will contain information about the currently logged-in user
             this.userId = response.data._id;
@@ -49,9 +49,11 @@ export default {
         // },
         async displayEvent(){
             try {
-                const response = await axios.post('http://localhost:3000/get-events', { id:this.userId }, {  withCredentials: true });
-                const userData = response.data.eventInvitations;
+                const response = await axios.get('http://localhost:3000/api/get-events', {  withCredentials: true });
+                const userData = response.data;
                 console.log(userData);
+                this.events = [];   
+
                 userData.forEach(item => {
                     // Push each item into the events array
                     let datePart = item.startDate.slice(0, 10);
@@ -78,18 +80,6 @@ export default {
         //     this.events.splice(this.events.indexOf(event), 1);
         // },
     },
-    // methods: {
-    //     currdate({ date }) {
-    //         if (this.isToday(date)) {
-    //             return 'pink'; // You can return any color you wish here
-    //         }
-    //         return undefined; // Default color
-    //     },
-    //     isToday(date) {
-    //         const today = new Date();
-    //         return date.getDate() == today.getDate() && date.getMonth() == today.getMonth() && date.getFullYear() == today.getFullYear()
-    //     }
-    // }
 }
 </script>
 

@@ -83,20 +83,20 @@
                this.confpasswordError=true;
             }
          },
-         async checkMail(){
-            const response = await axios.get('http://localhost:5000/register');
-            const registeredEmails = response.data;
-            if(registeredEmails.includes(this.mail)){
-               this.emailError=false;
-               return;
-            } else{
-               this.emailError=true;
-            }
-         },
+         // async checkMail(){
+         //    const response = await axios.get('http://localhost:5000/register');
+         //    const registeredEmails = response.data;
+         //    if(registeredEmails.includes(this.mail)){
+         //       this.emailError=false;
+         //       return;
+         //    } else{
+         //       this.emailError=true;
+         //    }
+         // },
 
          async register(){
             try {
-               const res = await axios.post(`http://localhost:3000/signup`, {
+               const res = await axios.post(`http://localhost:3000/auth/signup`, {
                   //name: this.name,
                   email: this.mail,
                   password: this.password,

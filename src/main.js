@@ -44,7 +44,7 @@ router.beforeEach(async (to, from, next) => {
             //     next({ name: 'Login' });
             // }
 
-            const response = await axios.get(`http://localhost:3000/home`,{withCredentials:true});
+            const response = await axios.get(`http://localhost:3000/api/home`,{withCredentials:true});
             if (response.data.success) {
                 console.log("hai bhai",response)
                 next();
