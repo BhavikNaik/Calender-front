@@ -5,7 +5,7 @@
                 <span class="norText">
                     Create an Event !!
                 </span>
-                <button class="closeSymbol" @click="close">X</button>
+                <button class="closeSymbol" @click="close">&times;</button>
             </div>
             <div class="modfield">
                 <input type="text" v-model="ename" id="ename" placeholder="Name">

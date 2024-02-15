@@ -1,16 +1,34 @@
 <template>
     <div>
         <div class="nav">
-            <h2 style="display: flex;flex-wrap: nowrap;"><span  class="fas fa-solid fa-calendar" style="margin-right: 8px;"></span>Calender</h2>
+            <h2 style="display: flex;flex-wrap: nowrap;"><span  class="fas fa-solid fa-calendar" style="margin-right: 8px;"></span>Calendar</h2>
             <!-- <span class="fas fa-sharp fa-regular fa-list" style="margin-right: 8px;"></span> -->
             <div class="navright">
-                <button class="createEvent" @click="getEvents">Get Events</button>
+                <!-- <button class="createEvent" @click="getEvents">Get Events</button> -->
                 <!-- <button class="createEvent" @click="ifAuth">Email</button> -->
                 <button class="createEvent" @click="showToast">Create Event</button>
                 <button @click="logout">
                 <!-- <div v-show="!isLarge" class="createEvent">Logout</div> -->
-                    <div class="logout"><img src="../assets/logout.png" style="max-width:30px;max-height: 20px;padding: 0;"/></div>
+                    <div class="logout"><img src="http://localhost:5173/src/assets/logout.png" style="max-width:30px;max-height: 20px;padding: 0;"/></div>
                 </button>
+            </div>
+        </div>
+        <div v-if="isOpenMod" class="modal">
+            <div class="modal-content">
+                <div class="inner-modal-top"><div>Invitation</div><div class="close" @click="closeModal">&times;</div></div>
+                <div class="inner-modal-content">
+                    <div style="text-align: center;margin:4px 2px;padding: 6px 0; font-size: 1.5rem; border-bottom: 1px solid beige;">{{ selectedInvitation.title }}</div>
+                    <div class="inner-modal"><div class="modal-labels">Description: </div><div class="modal-value">{{ selectedInvitation.description }}</div></div>
+                    <div class="inner-modal"><span class="modal-labels">Start Time: </span><span class="modal-value">{{ selectedInvitation.start }}</span></div>
+                    <div class="inner-modal"><span class="modal-labels">End Time: </span><span class="modal-value">{{ selectedInvitation.end }}</span></div>
+                    <div class="inner-modal"><div class="modal-labels">Invited by:</div><div class="modal-value">{{ selectedInvitation.host }}</div></div>
+                    <div class="buttons" style="margin: 1em 0.5em;">
+                        <button class="inner-buttons2" @click="submitYes(selectedInvitation.id)">Yes</button>
+                        <button class="inner-buttons2" @click="submitNo(selectedInvitation.id)">No</button>
+                        <button class="inner-buttons2" @click="submitMaybe(selectedInvitation.id)">Maybe</button>
+                    </div>
+                </div>
+
             </div>
         </div>
         <Teleport to="body" v-if="showT">
@@ -22,17 +40,17 @@
             <div class="leftCal">
                 <VCalendar :attributes="attrs" is-dark="{}" class="cal"/>
                 <div class="dropdown">
-                    <div style="display: flex;justify-content: space-between; padding: 5px 10px;font-size: 1.2rem;">
+                    <div style="display: flex;justify-content: space-between; padding: 5px 10px;font-size: 1.2rem; border-bottom: 1px solid black;">
                         <div>Invitations</div>
                         <div><button @click="toggleDropdown">V</button></div>
                     </div>
                     <!-- <div v-if="isOpen" class="dropdown-content"> -->
+                    
                     <div class="inner-scroll">
-                        <div v-if="isOpen" v-for="invitation in invitations" class="dropdown-content" v-on:click="handleSelect(invitation)">
+                        <div v-if="isOpen" v-for="invitation in invitations" class="dropdown-content" v-on:click="openModal(invitation)">
                             <div class="inner-content">
                                 <div>Title: {{invitation.title}}</div>
-                                <div>Start Time: {{invitation.start}}</div>
-                                <div>End Time: {{invitation.end}}</div>
+                                <div>Time: {{invitation.start}} - {{invitation.end}}</div>
                                 <div>Invited by: {{invitation.host}}</div>
                                 <div class="buttons">
                                     <button class="inner-buttons" @click="submitYes(invitation.id)">Yes</button>
@@ -43,7 +61,7 @@
                     </div>
                 </div>
             </div>
-            <Calender class="calendar" v-if="renderComponent"/>
+            <Calender class="calendar"/>
         </div>
     </div>
 </template>
@@ -52,7 +70,6 @@
 // import { useToast } from "vue-toastification";
 import CreateEvent from './CreateEvent.vue'
 import Calender from "./Calender.vue";
-import { nextTick, ref, onMounted } from 'vue';
 import axios from 'axios';
 
 export default {
@@ -60,10 +77,6 @@ export default {
         CreateEvent,
         Calender
     },
-    // setup() {
-    //     const toast = useToast();
-    //     return { toast }
-    // },
     data() {
         return {
             isAuthenticated: false,
@@ -76,6 +89,8 @@ export default {
             attrs: [],
             selectItem:'',
             renderComponent: true,
+            isOpenMod: false,
+            selectedInvitation: null,
         }
     },
     // computed:{
@@ -200,6 +215,7 @@ export default {
 
                     this.invitations.push({
                         title: item.title,
+                        description: item.description,
                         start: this.stime,
                         end: this.etime,
                         host: item.host,
@@ -216,12 +232,20 @@ export default {
                 console.error("errrr",error);
             }
         },
+        openModal(invitation) {
+            this.isOpenMod = true;
+            this.selectedInvitation = invitation;
+        },
+        closeModal() {
+            this.isOpenMod = false;
+        },
         async submitYes(Id){
             try {
                 const response = await axios.post(`http://localhost:3000/api/rsvp/${Id}`, {status:"accept"}, {  withCredentials: true });
                 const userData = response.data;
                 console.log(userData); 
                 this.getInvitations();
+                this.isOpenMod = false;
             } catch (error) {
                 console.error("errrr",error);
             }
@@ -232,6 +256,7 @@ export default {
                 const userData = response.data;
                 console.log(userData); 
                 this.getInvitations();
+                this.isOpenMod = false;
             } catch (error) {
                 console.error("errrr",error);
             }
@@ -242,6 +267,7 @@ export default {
                 const userData = response.data;
                 console.log(userData); 
                 this.getInvitations();
+                this.isOpenMod = false;
             } catch (error) {
                 console.error("errrr",error);
             }
@@ -270,20 +296,6 @@ export default {
         handleFormSubmitted() {
             this.showT = false
             console.log("Submitted")
-            // const response = await axios.post('http://localhost:3000/logout', {
-            //         email: this.mail,
-            //         ename: this.ename,
-            //         desc: this.desc,
-            //         startTime: this.startTime,
-            //         endTime: this.endTime,
-            //    })
-            //     .then(() => {
-            //         // this.$router.push('/login')
-            //     }).catch((e) => {
-            //         console.log(response)
-            //         console.log(e)
-            //     })
-            // 
         },
     }
 }
@@ -373,7 +385,7 @@ export default {
 
 .calendar {
   flex: 1;
-  margin: 0 25px;
+  margin: 0 2%;
   max-height: 640px;
 }
 
@@ -447,6 +459,36 @@ export default {
   line-height: 50px;
   margin-left: 15px;
 }
+
+.modfield2{
+  height: 30px;
+  width: 100%;
+  max-width: 260px;
+  align-self: flex-end;
+  position: relative;
+  /* margin: 15px 0 25px 0; */
+}
+
+.modfield2 input{
+  height: 100%;
+  width: 100%;
+  padding-left: 2rem;
+  /* outline: none; */
+  border: none;
+  font-size: 12px;
+  background: #faf3f3;
+  color: #595959;
+  border-radius: 7px;
+  box-shadow: inset 2px 2px 5px #f9efef,
+              inset -5px -5px 10px #ffffff73;
+}
+
+.modfield2 span{
+  position: absolute;
+  left: 10px;
+  color: #595959;
+  line-height: 30px;
+}
 .cal{
     margin-left: 20px;
     min-width: 300px;
@@ -455,7 +497,7 @@ export default {
 .dropdown {
   display: flex;
   flex-direction: column;
-  border: 2px solid black;
+  /* border: 2px solid black; */
   max-width: 300px;
   margin-left: 20px;
   margin-top: 10px;
@@ -464,53 +506,149 @@ export default {
 .inner-scroll{
     max-height: 320px;
   overflow-y: auto;
+  /* padding: 5px 10px;
+  background-color: #c4c4c4; */
 
 }
 
 .dropdown-content {
   display: flex;
   flex-direction: row;
-  /* position: absolute; */
   background-color: #e7e6e6;
   min-width: 150px;
-  max-height: 200px; /* Set maximum height */
-  /* overflow-y: auto; Enable vertical scrollbar */
+  max-height: 200px;
   z-index: 1;
+  font-size: 0.85rem;
 }
 
 .inner-content {
     display: flex;
     flex-direction: column;
     padding: 10px;
-    border: 2px solid #3f0a0a;
+    border-bottom: 2px solid #3f0a0a;
 }
 .buttons{
     display: flex;
-    justify-content: space-evenly;
-    margin-top: 10px;
+    justify-content: space-between;
+    margin-top: 5px;
 }
 
 .inner-buttons {
     padding: 4px 7px;
-    background-color: #0066ff;
+    background-color: #000000;
     color: white;
 }
-
-/* .dropdown-content button {
-  width: 100%;
-  padding: 8px 12px;
-  text-align: left;
-  border: none;
-  background-color: transparent;
-  cursor: pointer;
-} */
-
-/* .dropdown-content button:hover {
-  background-color: #ddd;
+.inner-buttons2 {
+    padding: 7px 14px;
+    background-color: #000000;
+    color: white;
+    font-size: 1.1rem;
 }
 
-.dropdown:hover .dropdown-content {
+.modal {
   display: block;
-} */
+  position: fixed;
+  z-index: 3;
+  left: 0;
+  top: 0;
+  width: 100%;
+  height: 100%;
+  background-color: rgba(0, 0, 0, 0.6);
+}
+
+.modal-content {
+  background-color: #ffeae3;
+  margin: 10% auto;
+  z-index: 2;
+  padding: 20px;
+  border: 1px solid #888;
+  width: 80%;
+  max-width: 500px;
+  border-radius: 8px; /* Rounded corners */
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+}
+
+.inner-modal-top{
+    display: flex;
+    justify-content: space-between;
+    font-size: 1.2rem;
+    border-bottom: 1px solid grey;
+    color: #595959;
+}
+
+.inner-modal-content{
+    display: flex;
+    /* justify-content: center; */
+    flex-direction: column;
+    padding: 5px 10px;
+  background-color: #c4c4c4;
+    /* align-items: center; */
+}
+.modal-labels{
+    /* max-width: 20%; */
+    font-size: 1.2rem;
+    font: "Helvetica",sans-serif;
+    font-weight: bold;
+  margin-right: 10px;
+  width: 120px;
+  /* min-width:80px; */
+  color: #000000;
+  text-shadow: 1px 1px 1px #ffffff;
+}
+.modal-value {
+  flex: 1;
+  margin-left: 5px;
+  max-width: 260px;
+  align-self: flex-end;
+  color: #566afe;
+  text-shadow: 1px 1px 1px #000000;
+  font-size: 1.1rem;
+  margin-right: 10px;
+  word-wrap: break-word;
+    overflow-wrap: break-word;
+  /* text-align: left; */
+}
+
+.inner-modal{
+    font-size: 1.2rem;
+    padding: 5px 15px;
+    text-shadow: 1px 1px 1px white;
+    display: flex;
+    justify-content: space-between;
+    margin-bottom: 8px;
+    /* justify-content: flex-end; */
+}
+
+@media (max-width: 500px) {
+  .inner-modal {
+    flex-direction: column;
+    align-items: flex-start;
+  }
+
+  .modal-labels {
+    width: auto;
+    margin-bottom: 5px;
+  }
+
+  .modal-value {
+    margin-right: 10px;
+    max-width: 220px;
+    align-self: flex-start;
+    margin-left: 0;
+    word-wrap: break-word;
+    overflow-wrap: break-word;
+  }
+}
+
+.close {
+  color: #2a2525;
+  float: right;
+  font-size: 28px;
+  font-weight: bold;
+}
+
+.close:hover,.close:focus {
+  color: rgb(133, 131, 131);
+}
 
 </style>
