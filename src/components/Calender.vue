@@ -238,6 +238,8 @@ export default {
             this.selectEvent = [];
             this.addInv = '';
             this.remInv = '';
+            this.remMails = [];
+            this.invMails = [];
         },
 
         async editEvent(Id) {
@@ -279,7 +281,7 @@ export default {
                 const userData = response.data;
                 console.log("get wala", userData);
                 this.displayEvent();
-                this.emit("loading");
+                // this.emit("loading");
                 this.closeModal();
             } catch (error) {
                 console.error("errrr", error);
