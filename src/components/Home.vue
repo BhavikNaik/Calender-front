@@ -21,7 +21,7 @@
                     <div class="inner-modal"><div class="modal-labels">Description: </div><div class="modal-value">{{ selectedInvitation.description }}</div></div>
                     <div class="inner-modal"><span class="modal-labels">Start Time: </span><span class="modal-value">{{ selectedInvitation.start }}</span></div>
                     <div class="inner-modal"><span class="modal-labels">End Time: </span><span class="modal-value">{{ selectedInvitation.end }}</span></div>
-                    <div class="inner-modal"><div class="modal-labels">Invited by:</div><div class="modal-value">{{ selectedInvitation.host }}</div></div>
+                    <div class="inner-modal"><div class="modal-labels">Invited by:</div><div class="modal-value">{{ selectedInvitation.hostEmail }}</div></div>
                     <div class="buttons" style="margin: 1em 0.5em;">
                         <button class="inner-buttons2" @click="submitYes(selectedInvitation.id)">Yes</button>
                         <button class="inner-buttons2" @click="submitNo(selectedInvitation.id)">No</button>
@@ -51,7 +51,7 @@
                             <div class="inner-content">
                                 <div>Title: {{invitation.title}}</div>
                                 <div>Time: {{invitation.start}} - {{invitation.end}}</div>
-                                <div>Invited by: {{invitation.host}}</div>
+                                <div>Invited by: {{invitation.hostEmail}}</div>
                                 <div class="buttons">
                                     <button class="inner-buttons" @click="submitYes(invitation.id)">Yes</button>
                                     <button class="inner-buttons" @click="submitNo(invitation.id)">No</button>
@@ -61,7 +61,7 @@
                     </div>
                 </div>
             </div>
-            <Calender class="calendar"/>
+            <Calender ref="calUpdate"/>
         </div>
     </div>
 </template>
@@ -109,16 +109,8 @@ export default {
             this.userId = response.data._id;
             await this.getInvitations();
             await this.getEvents();
-            this.attrs = [
-            {
-                key: 'today',
-                highlight: true,
-                dates: new Date(),
-            },
-            {
-                dot: 'red',
-                dates: this.eventstarts.map(invitation => invitation.start)
-            }];
+            await this.smallCalendar();
+            // await this.$ref.calUpdate.displayEvent();
             // console.log("as",this.invitestarts);
             // console.log("ye",JSON.parse(JSON.stringify(this.invitestarts)));
             // console.log("as",this.attrs);
@@ -145,6 +137,19 @@ export default {
             // console.log(invitation);
             this.selectItem = invitation.id;
             console.log(this.selectItem);
+        },
+        smallCalendar() {
+            this.attrs = [
+                {
+                    key: 'today',
+                    highlight: true,
+                    dates: new Date(),
+                },
+                {
+                    dot: 'red',
+                    dates: this.eventstarts.map(invitation => invitation.start)
+                }
+            ];
         },
         async logout() {
             // await axios.post('http://localhost:3000/logout', { withCredentials: true })
@@ -176,7 +181,11 @@ export default {
         async getEvents(){
             try {
                 const response = await axios.get(`http://localhost:3000/api/get-events`, {  withCredentials: true });
-                const userData = response.data;
+                const eventsAttending = response.data.eventsAttending;
+                const maybeAttending = response.data.maybeAttending;
+
+                const userData = eventsAttending.concat(maybeAttending);
+                //const userData = response.data;
                 console.log(userData);
                 userData.forEach(item => {
                     // Push each item into the events array
@@ -189,6 +198,7 @@ export default {
                         start: this.stime.slice(0,10),
                     });
                 });
+                this.smallCalendar();
 
             } catch (error) {
                 console.error("errrr",error);
@@ -219,6 +229,7 @@ export default {
                         start: this.stime,
                         end: this.etime,
                         host: item.host,
+                        hostEmail: item.hostEmail, 
                         id: item._id,
                     });
 
@@ -245,6 +256,8 @@ export default {
                 const userData = response.data;
                 console.log(userData); 
                 this.getInvitations();
+                this.smallCalendar();
+                this.$ref.calUpdate.displayEvent();
                 this.isOpenMod = false;
             } catch (error) {
                 console.error("errrr",error);
@@ -267,6 +280,8 @@ export default {
                 const userData = response.data;
                 console.log(userData); 
                 this.getInvitations();
+                this.smallCalendar();
+                this.$ref.calUpdate.displayEvent();
                 this.isOpenMod = false;
             } catch (error) {
                 console.error("errrr",error);
@@ -638,6 +653,23 @@ export default {
     word-wrap: break-word;
     overflow-wrap: break-word;
   }
+}
+
+@media (max-width: 1000px) {
+.leftCal{
+    margin: 0 auto;
+    width: 100%;
+    flex-direction: row;
+    justify-content: space-evenly;
+}
+}
+
+@media (max-width: 650px) {
+.leftCal{
+    margin: 0 auto;
+    width: 100%;
+    flex-direction: column;
+}
 }
 
 .close {

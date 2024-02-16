@@ -50,7 +50,7 @@
                 </div>
                 <div class="inner-modal" v-if="selectEvent.host !== userId">
                     <div class="modal-labels">Invited by:</div>
-                    <div class="modal-value">{{ selectEvent.host }}</div>
+                    <div class="modal-value">{{ selectEvent.hostEmail }}</div>
                 </div>
                 <div class="buttons" style="margin: 1em 0.5em;" v-show="selectEvent.host === userId">
                     <button class="inner-buttons2" @click="editEvent(selectEvent.id)">Update</button>
@@ -162,7 +162,11 @@ export default {
         async displayEvent() {
             try {
                 const response = await axios.get('http://localhost:3000/api/get-events', { withCredentials: true });
-                const userData = response.data;
+                const eventsAttending = response.data.eventsAttending;
+                const maybeAttending = response.data.maybeAttending;
+
+                const userData = eventsAttending.concat(maybeAttending);
+                //const userData = response.data;
                 console.log("get wala", userData);
                 this.events = [];
 
@@ -184,6 +188,7 @@ export default {
                         end: this.etime,
                         description: item.description,
                         host: item.host,
+                        hostEmail: item.hostEmail,
                         id: item._id,
                     });
                 });
@@ -191,29 +196,39 @@ export default {
                 console.error("errrr", error);
             }
         },
+        dateTimeChangeFormat(datess){
+            let dates = new Date(datess);
+            dates.setHours(dates.getHours() + 5, dates.getMinutes() + 30);
+            let datePart = dates.toISOString().slice(0, 10);
+            let timePart = dates.toISOString().slice(11, 16);
+            let dateTimeString = `${datePart} ${timePart}`;
+            return dateTimeString;
+        },
 
         onEventClick(event,e) {
 
             this.selectEvent = event;
-
-            let date = new Date(this.selectEvent.start);
-            date.setHours(date.getHours() + 5, date.getMinutes() + 30);
-            // let formattedDateTime = date.toISOString().slice(0, 16);
-            // this.selectEvent.start = formattedDateTime;
-            // formattedDateTime = date.toISOString().slice(0, 16);
-            // this.selectEvent.end = formattedDateTime;
-            let datePart = date.toISOString().slice(0, 10);
-            let timePart = date.toISOString().slice(11, 16);
-            let dateTimeString = `${datePart} ${timePart}`;
-            this.selectEvent.start = dateTimeString;
-
-            date = new Date(this.selectEvent.end);
-            date.setHours(date.getHours() + 5, date.getMinutes() + 30);
-            datePart = date.toISOString().slice(0, 10);
-            timePart = date.toISOString().slice(11, 16);
-            dateTimeString = `${datePart} ${timePart}`;
-            this.selectEvent.end = dateTimeString;
+            this.selectEvent.start = this.dateTimeChangeFormat(this.selectEvent.start);
+            this.selectEvent.end = this.dateTimeChangeFormat(this.selectEvent.end);
             console.log(this.selectEvent);
+
+            // let date = new Date(this.selectEvent.start);
+            // date.setHours(date.getHours() + 5, date.getMinutes() + 30);
+            // // let formattedDateTime = date.toISOString().slice(0, 16);
+            // // this.selectEvent.start = formattedDateTime;
+            // // formattedDateTime = date.toISOString().slice(0, 16);
+            // // this.selectEvent.end = formattedDateTime;
+            // let datePart = date.toISOString().slice(0, 10);
+            // let timePart = date.toISOString().slice(11, 16);
+            // let dateTimeString = `${datePart} ${timePart}`;
+            // this.selectEvent.start = dateTimeString;
+
+            // date = new Date(this.selectEvent.end);
+            // date.setHours(date.getHours() + 5, date.getMinutes() + 30);
+            // datePart = date.toISOString().slice(0, 10);
+            // timePart = date.toISOString().slice(11, 16);
+            // dateTimeString = `${datePart} ${timePart}`;
+            // this.selectEvent.end = dateTimeString;
 
             this.isOpenMod = true;
             e.stopPropagation();
@@ -221,6 +236,8 @@ export default {
         closeModal() {
             this.isOpenMod = false;
             this.selectEvent = [];
+            this.addInv = '';
+            this.remInv = '';
         },
 
         async editEvent(Id) {
@@ -261,6 +278,8 @@ export default {
                 , { withCredentials: true });
                 const userData = response.data;
                 console.log("get wala", userData);
+                this.displayEvent();
+                this.emit("loading");
                 this.closeModal();
             } catch (error) {
                 console.error("errrr", error);
@@ -271,6 +290,7 @@ export default {
                 const response = await axios.delete(`http://localhost:3000/api/delete/${Id}`, { withCredentials: true });
                 const userData = response.data;
                 console.log("deleted ye", userData);
+                this.displayEvent();
                 this.closeModal();
             } catch (error) {
                 console.error("errrr", error);
