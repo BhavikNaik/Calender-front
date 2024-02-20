@@ -34,6 +34,8 @@
 
 <script>
 import axios from 'axios';
+import { useToast } from 'vue-toastification';
+
 export default {
     data() {
         return {
@@ -102,6 +104,21 @@ export default {
             // Clear the input field
             this.emailsInput = '';
         },
+        triggerToast(msg) {
+            const toast = useToast();
+            
+            toast(`${msg}`, {
+            position: "bottom-right",
+            timeout: 2500,
+            closeOnClick: true,
+            pauseOnFocusLoss: true,
+            pauseOnHover: true,
+            hideProgressBar: true,
+            closeButton: "button",
+            icon: "far fa-thumbs-up",
+            rtl: false
+            });
+         },
         // getEmail(){
         //     this.host = this.$cookies.get('email');
         // },
@@ -144,6 +161,7 @@ export default {
                 },{withCredentials: true});
                 console.log('Event created:', response.data);
                 this.$emit('create-event', response.data);
+                this.triggerToast("Event Added Successfully !!");
                 this.mails = [];
                 this.emails ='';
                 this.$emit('close');

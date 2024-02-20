@@ -1,6 +1,6 @@
 <template>
-    <div v-if="isOpenMod" class="modal">
-        <div class="modal-content">
+    <div v-if="isOpenMod" class="modal2">
+        <div class="modal-content2">
             <div class="inner-modal-top">
                 <div>Event</div>
                 <div class="close" @click="closeModal">&times;</div>
@@ -32,7 +32,7 @@
                         <input type="datetime-local" v-model="selectEvent.end" id="end">
                         <span class="fas fa-calendar-alt"></span>
                     </div>
-                    <!-- <div class="modal-value" v-else><input v-model="selectEvent.end"></div> -->
+
                 </div>
                 <div class="inner-modal" v-if="selectEvent.host === userId">
                     <div class="modal-labels">Add Invites:</div>
@@ -59,7 +59,8 @@
             </div>
         </div>
     </div>
-    <VueCal class="calendar" :disable-views="['years', 'year', 'month']" :on-event-click="onEventClick" :events="events" />
+    
+    <VueCal class="calendar" :disable-views="['years', 'year', 'month']" :on-event-click="onEventClick" :events="events"/>
     <!-- :time-from="8 * 60" 
     :time-to="20 * 60" -->
     <!-- style="max-height: 750px;min-width: 100%" -->
@@ -70,6 +71,7 @@
 <script>
 import axios from 'axios';
 import VueCal from 'vue-cal';
+import { useToast } from 'vue-toastification';
 
 export default {
     components: {
@@ -95,6 +97,7 @@ export default {
             startTimeError: '',
             endTimeError: '',
             ownmail: '',
+            showDialog: false,
         }
     },
     async mounted() {
@@ -152,6 +155,21 @@ export default {
             // Clear the input field
             mailsInput = '';
         },
+        triggerToast(msg) {
+            const toast = useToast();
+            
+            toast(`${msg}`, {
+            position: "bottom-right",
+            timeout: 2500,
+            closeOnClick: true,
+            pauseOnFocusLoss: true,
+            pauseOnHover: true,
+            hideProgressBar: true,
+            closeButton: "button",
+            icon: "far fa-thumbs-up",
+            rtl: false
+            });
+         },
         // addEvent() {
         //     this.events.push({
         //         title: 'New Event',
@@ -231,9 +249,11 @@ export default {
             // this.selectEvent.end = dateTimeString;
 
             this.isOpenMod = true;
+            //this.showDialog = true;
             e.stopPropagation();
         },
         closeModal() {
+            //this.showDialog = false;
             this.isOpenMod = false;
             this.selectEvent = [];
             this.addInv = '';
@@ -280,6 +300,7 @@ export default {
                 , { withCredentials: true });
                 const userData = response.data;
                 console.log("get wala", userData);
+                this.triggerToast("Event Updated !!");
                 this.displayEvent();
                 // this.emit("loading");
                 this.closeModal();
@@ -292,6 +313,7 @@ export default {
                 const response = await axios.delete(`http://localhost:3000/api/delete/${Id}`, { withCredentials: true });
                 const userData = response.data;
                 console.log("deleted ye", userData);
+                this.triggerToast("Event Deleted !!");
                 this.displayEvent();
                 this.closeModal();
             } catch (error) {
@@ -305,6 +327,50 @@ export default {
 
 }
 </script>
+
+<style>
+.modal2 {
+  display: block;
+  position: fixed;
+  z-index: 3;
+  left: 0;
+  top: 0;
+  width: 100%;
+  height: 100%;
+  background-color: rgba(0, 0, 0, 0.6);
+}
+
+.modal-content2 {
+  background-color: #ffeae3;
+  margin: 10% auto;
+  z-index: 4;
+  padding: 20px;
+  border: 1px solid #888;
+  width: 80%;
+  max-width: 500px;
+  border-radius: 8px;
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+}
+
+.vuecal__event {
+    cursor: pointer;
+    /* background-color: rgba(6, 23, 85, 0.692); */
+    font-style: italic;
+    /* z-index: 1; */
+}
+
+.vuecal__event-title {
+  color: rgb(0, 0, 0);
+  font-weight: bold;
+  margin: 4px 0 8px;
+}
+
+.vuecal__event-time {
+    font-weight: bold;
+  color: rgb(0, 0, 0);
+}
+
+</style>
 
 <!-- <style>
 /* .outerCal {

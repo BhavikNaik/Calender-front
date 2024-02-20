@@ -16,7 +16,8 @@
     "vue-cal": "^4.8.1",
     "vue-cookies": "^1.8.3",
     "vue-router": "^4.2.5",
-    "vue-toastification": "^2.0.0-rc.5"
+    "vue-toastification": "^2.0.0-rc.5",
+    "vuetify": "^3.5.4"
   },
   "devDependencies": {
     "@vitejs/plugin-vue": "^4.5.2",

@@ -15,6 +15,14 @@ import VueCal from 'vue-cal'
 import 'vue-cal/dist/vuecal.css'
 import VueCookies from 'vue-cookies'
 //import CalenderVue from './components/Calender.vue'
+// import { createVuetify } from 'vuetify'
+
+// export const vuetify = createVuetify({
+//   theme: {
+//     defaultTheme: 'light',
+//     //
+//   },
+// })
 
 const app = createApp(App)
 

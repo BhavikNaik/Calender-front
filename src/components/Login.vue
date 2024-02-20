@@ -28,6 +28,8 @@
 
 <script>
 import axios from "axios";
+import { useToast } from "vue-toastification";
+
     export default {
       data() {
          return {
@@ -55,6 +57,21 @@ import axios from "axios";
                this.passwordError=true;
             }
          },
+         triggerToast() {
+            const toast = useToast();
+            
+            toast("Login Successful !!", {
+            position: "bottom-right",
+            timeout: 3000,
+            closeOnClick: true,
+            pauseOnFocusLoss: true,
+            pauseOnHover: true,
+            hideProgressBar: true,
+            closeButton: "button",
+            icon: "far fa-thumbs-up",
+            rtl: false
+            });
+         },
          async loginCheck() {
             // if(this.emailError || this.passwordError) {
             //    return;
@@ -69,6 +86,7 @@ import axios from "axios";
                //if (response.data.success) {
                // Store email in cookie
                // this.$cookies.set('email', response.data.email, { expires: '1d' });
+               this.triggerToast();
                
                this.$router.push('/home');
             } catch (e) {

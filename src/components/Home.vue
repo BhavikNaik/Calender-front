@@ -1,5 +1,5 @@
 <template>
-    <div>
+    <div class="fullbg">
         <div class="nav">
             <h2 style="display: flex;flex-wrap: nowrap;"><span  class="fas fa-solid fa-calendar" style="margin-right: 8px;"></span>Calendar</h2>
             <!-- <span class="fas fa-sharp fa-regular fa-list" style="margin-right: 8px;"></span> -->
@@ -40,7 +40,7 @@
             <div class="leftCal">
                 <VCalendar :attributes="attrs" is-dark="{}" class="cal"/>
                 <div class="dropdown">
-                    <div style="display: flex;justify-content: space-between; padding: 5px 10px;font-size: 1.2rem; border-bottom: 1px solid black;">
+                    <div style="display: flex;justify-content: space-between; padding: 5px 10px;font-size: 1.2rem; border-bottom: 1px solid black;min-width: 200px;">
                         <div>Invitations</div>
                         <div><button @click="toggleDropdown">V</button></div>
                     </div>
@@ -61,7 +61,7 @@
                     </div>
                 </div>
             </div>
-            <Calender ref="calUpdate"/>
+            <Calender />
         </div>
     </div>
 </template>
@@ -71,6 +71,7 @@
 import CreateEvent from './CreateEvent.vue'
 import Calender from "./Calender.vue";
 import axios from 'axios';
+import { useToast } from 'vue-toastification';
 
 export default {
     components: {
@@ -151,6 +152,36 @@ export default {
                 }
             ];
         },
+        triggerToast() {
+            const toast = useToast();
+            
+            toast("Login Successful !!", {
+            position: "bottom-right",
+            timeout: 3000,
+            closeOnClick: true,
+            pauseOnFocusLoss: true,
+            pauseOnHover: true,
+            hideProgressBar: true,
+            closeButton: "button",
+            icon: "far fa-thumbs-up",
+            rtl: false
+            });
+         },
+         triggerToast(msg) {
+            const toast = useToast();
+            
+            toast(`${msg}`, {
+            position: "bottom-right",
+            timeout: 2500,
+            closeOnClick: true,
+            pauseOnFocusLoss: true,
+            pauseOnHover: true,
+            hideProgressBar: true,
+            closeButton: "button",
+            icon: "far fa-thumbs-up",
+            rtl: false
+            });
+         },
         async logout() {
             // await axios.post('http://localhost:3000/logout', { withCredentials: true })
             //     .then((response) => {
@@ -164,6 +195,8 @@ export default {
                 const response = await axios.post('http://localhost:3000/auth/logout', null, {  withCredentials: true });
                 const userData = response.data;
                 console.log(userData);
+                this.triggerToast('Logout Successful !!');
+                
                 this.$router.push('/login')
             } catch (error) {
                 console.error("errrr",error);
@@ -257,7 +290,8 @@ export default {
                 console.log(userData); 
                 this.getInvitations();
                 this.smallCalendar();
-                this.$ref.calUpdate.displayEvent();
+                this.triggerToast('Invite Accepted !!');
+                //this.$ref.calUpdate.displayEvent();
                 this.isOpenMod = false;
             } catch (error) {
                 console.error("errrr",error);
@@ -269,6 +303,7 @@ export default {
                 const userData = response.data;
                 console.log(userData); 
                 this.getInvitations();
+                this.triggerToast('Invite Declined !!');
                 this.isOpenMod = false;
             } catch (error) {
                 console.error("errrr",error);
@@ -281,6 +316,7 @@ export default {
                 console.log(userData); 
                 this.getInvitations();
                 this.smallCalendar();
+                this.triggerToast('Maybe Attending !!');
                 this.$ref.calUpdate.displayEvent();
                 this.isOpenMod = false;
             } catch (error) {
@@ -291,17 +327,6 @@ export default {
         //     this.cookieEmail = this.$cookies.get('email');
         //     console.log("home pe", this.cookieEmail)
         // },
-        // triggerToast() {
-        //     this.toast("Hi from LogRocket", {
-        //         position: "top-center",
-        //         closeOnClick: true,
-        //         draggable: true,
-        //         draggablePercent: 0.6,
-        //         showCloseButtonOnHover: false,
-        //         closeButton: "button",
-        //         icon: "fas fa-rocket",
-        //     });
-        // }
         showToast() {
             this.showT = true
         },
@@ -317,6 +342,11 @@ export default {
 </script>
 
 <style>
+
+.fullbg{
+    background-color: linear-gradient(to right, #d9d8d8, #ffffff, #ffffff, #cecece);
+    height: 100vh;
+}
 .maintoast {
     display: flex;
     justify-content: center;
@@ -436,8 +466,8 @@ export default {
     display: flex;
     margin: 10px auto;
     padding: 8px 20px;
-    color: #000000;
-    font-weight: 700;
+    color: #ffffff;
+    font-weight: 500;
     background-color: rgba(22, 71, 231, 0.918);
     border: none;
     font-size: 1.2rem;
@@ -574,7 +604,7 @@ export default {
 .modal-content {
   background-color: #ffeae3;
   margin: 10% auto;
-  z-index: 2;
+  z-index: 4;
   padding: 20px;
   border: 1px solid #888;
   width: 80%;
@@ -589,6 +619,7 @@ export default {
     font-size: 1.2rem;
     border-bottom: 1px solid grey;
     color: #595959;
+    z-index: 5;
 }
 
 .inner-modal-content{
@@ -597,6 +628,7 @@ export default {
     flex-direction: column;
     padding: 5px 10px;
   background-color: #c4c4c4;
+  z-index: 5;
     /* align-items: center; */
 }
 .modal-labels{
