@@ -152,21 +152,21 @@ export default {
                 }
             ];
         },
-        triggerToast() {
-            const toast = useToast();
+        // triggerToast() {
+        //     const toast = useToast();
             
-            toast("Login Successful !!", {
-            position: "bottom-right",
-            timeout: 3000,
-            closeOnClick: true,
-            pauseOnFocusLoss: true,
-            pauseOnHover: true,
-            hideProgressBar: true,
-            closeButton: "button",
-            icon: "far fa-thumbs-up",
-            rtl: false
-            });
-         },
+        //     toast("Login Successful !!", {
+        //     position: "bottom-right",
+        //     timeout: 3000,
+        //     closeOnClick: true,
+        //     pauseOnFocusLoss: true,
+        //     pauseOnHover: true,
+        //     hideProgressBar: true,
+        //     closeButton: "button",
+        //     icon: "far fa-thumbs-up",
+        //     rtl: false
+        //     });
+        //  },
          triggerToast(msg) {
             const toast = useToast();
             
