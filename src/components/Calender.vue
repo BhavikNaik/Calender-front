@@ -226,8 +226,8 @@ export default {
         onEventClick(event,e) {
 
             this.selectEvent = event;
-            this.selectEvent.start = this.dateTimeChangeFormat(this.selectEvent.start);
-            this.selectEvent.end = this.dateTimeChangeFormat(this.selectEvent.end);
+            // this.selectEvent.start = this.dateTimeChangeFormat(this.selectEvent.start);
+            // this.selectEvent.end = this.dateTimeChangeFormat(this.selectEvent.end);
             console.log(this.selectEvent);
 
             // let date = new Date(this.selectEvent.start);
@@ -284,16 +284,16 @@ export default {
                 this.addEmail(this.addInv,this.invMails);
                 this.addEmail(this.remInv,this.remMails);
 
-                let date = new Date(this.selectEvent.start);
-                date.setHours(date.getHours() + 5, date.getMinutes() + 30);
-                let date2 = new Date(this.selectEvent.end);
-                date2.setHours(date2.getHours() + 5, date2.getMinutes() + 30);
+                // let date = new Date(this.selectEvent.start);
+                // date.setHours(date.getHours() + 5, date.getMinutes() + 30);
+                // let date2 = new Date(this.selectEvent.end);
+                // date2.setHours(date2.getHours() + 5, date2.getMinutes() + 30);
 
                 const response = await axios.post(`http://localhost:3000/api/editEvent/${Id}`, {
                     title: this.selectEvent.title,
                     description: this.selectEvent.description,
-                    startDate: date,
-                    endDate: date2,
+                    startDate: this.selectEvent.start,
+                    endDate: this.selectEvent.end,
                     attendeesToAdd: this.invMails,
                     attendeesToRemove: this.remMails
                 }

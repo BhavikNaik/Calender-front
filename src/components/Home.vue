@@ -317,7 +317,7 @@ export default {
                 this.getInvitations();
                 this.smallCalendar();
                 this.triggerToast('Maybe Attending !!');
-                this.$ref.calUpdate.displayEvent();
+                //this.$ref.calUpdate.displayEvent();
                 this.isOpenMod = false;
             } catch (error) {
                 console.error("errrr",error);

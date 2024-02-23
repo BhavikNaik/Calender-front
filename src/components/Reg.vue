@@ -14,6 +14,19 @@
                <input type="text" v-model="mail" id="mail" placeholder="Email Id">
                <span class="fas fa-envelope"></span>
             </div>
+            <div class="number-content">
+               <div class="field-code">
+                  <select v-model="selected">
+                     <option value="91">+91</option>
+                     <option value="00">+00</option>
+                  </select>
+               </div>
+               <div class="field">
+                  <input type="text" v-model="contactNo" id="contactNo" placeholder="Phone Number">
+                  <span class="fas fa-phone"></span>
+               </div>
+               
+            </div>
             <div class="field">
                <input type="password" v-model="password" id="password" placeholder="Password">
                <span class="fas fa-lock"></span>
@@ -43,10 +56,14 @@
             mail: '',
             password: '',
             confpassword: '',
+            selected: '91',
+            contactNo: '',
+            combinedNo: '',
             nameError: false,
             emailError: false,
             passwordError: false,
             confpasswordError: false,
+            contactNoError: false,
          };
       },
       methods: {
@@ -65,6 +82,14 @@
                this.emailError=false;
             } else{
                this.emailError=true;
+            }
+         },
+         validatePhoneNo() {
+            if(this.contactNo.length != 10) {
+               //alert('Password must be at least 6 characters');
+               this.contactNoError=false;
+            } else{
+               this.contactNoError=true;
             }
          },
          validatePassword() {
@@ -100,7 +125,9 @@
                   //name: this.name,
                   email: this.mail,
                   password: this.password,
-                  name: this.name
+                  name: this.name,
+                  //contactNo: this.combinedNo,
+                  // selected: this.selected,
                })
                console.log(this.mail," ",this.password)
                console.log(res.data)
@@ -120,6 +147,7 @@
             // Validate before submitting
             this.validateName();
             this.validateEmail();
+            this.validatePhoneNo();
             this.validatePassword();
             this.validateConfirmPassword();
             
@@ -129,13 +157,18 @@
             //    return;
             // }
 
-            // if (!this.nameError) {
-            //    alert('Name is required');
-            //    return;
-            // }
+            if (!this.nameError) {
+               alert('Name is required');
+               return;
+            }
 
             if (!this.emailError) {
                alert('Invalid email address or already taken');
+               return;
+            }
+
+            if (!this.contactNoError) {
+               alert('Phone number should contain 10 digits');
                return;
             }
 
@@ -148,10 +181,12 @@
                alert('Passwords must match');
                return;
             }
+
+            this.combinedNo = this.selected+this.contactNo;
             //this.checkMail();
             // console.log('Form submitted!');
-            // console.log(this.name,"", this.mail, "", this.password, "", this.confpassword);
-            this.register();
+            console.log(this.name,"", this.mail, "", this.combinedNo, "", this.password, "", this.confpassword);
+            // this.register();
 
             
          },
@@ -159,6 +194,6 @@
     }
 </script>
 
-<style scoped>
+<style>
 
 </style>
