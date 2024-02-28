@@ -352,6 +352,11 @@ export default {
   box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
 }
 
+/* .calendar{
+    z-index: 6;
+    position: relative;
+} */
+
 .vuecal__event {
     cursor: pointer;
     /* background-color: rgba(6, 23, 85, 0.692); */

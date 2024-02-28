@@ -4,6 +4,8 @@ import App from './App.vue'
 import reg from './components/Reg.vue'
 import login from './components/Login.vue'
 import HomeVue from './components/Home.vue'
+import AghomeVue from './components/Aghome.vue'
+import AdhomeVue from './components/Adhome.vue'
 import './components/styles.css'
 import axios from 'axios'
 import Toast from 'vue-toastification'
@@ -15,14 +17,7 @@ import VueCal from 'vue-cal'
 import 'vue-cal/dist/vuecal.css'
 import VueCookies from 'vue-cookies'
 //import CalenderVue from './components/Calender.vue'
-// import { createVuetify } from 'vuetify'
-
-// export const vuetify = createVuetify({
-//   theme: {
-//     defaultTheme: 'light',
-//     //
-//   },
-// })
+//import VueTable from 'vue-js-table';
 
 const app = createApp(App)
 
@@ -36,6 +31,8 @@ const router = createRouter({
         { path: '/', component: reg },
         { path: '/login', component: login, name: 'Login' },
         { path: '/home', component: HomeVue, meta: { requiresAuth: true }},
+        { path: '/aghome', component: AghomeVue, meta: { requiresAuth: true }},
+        { path: '/adhome', component: AdhomeVue, meta: { requiresAuth: true }},
         // meta: { requiresAuth: true }
     ]
 });
@@ -82,5 +79,6 @@ router.beforeEach(async (to, from, next) => {
 // Use the components
 app.component('VCalendar', Calendar)
 app.component('VDatePicker', DatePicker)
+// app.component('vue-table', VueTable);
 
 app.mount('#app')

@@ -1,12 +1,26 @@
 <template>
     <div class="fullbg">
         <div class="nav">
-            <h2 style="display: flex;flex-wrap: nowrap;"><span  class="fas fa-solid fa-calendar" style="margin-right: 8px;"></span>Calendar</h2>
+            <h2 style="display: flex;flex-wrap: nowrap;"><span class="fas fa-solid fa-calendar" style="margin-right: 8px;"></span>Calendar</h2>
             <!-- <span class="fas fa-sharp fa-regular fa-list" style="margin-right: 8px;"></span> -->
             <div class="navright">
                 <!-- <button class="createEvent" @click="getEvents">Get Events</button> -->
                 <!-- <button class="createEvent" @click="ifAuth">Email</button> -->
                 <button class="createEvent" @click="showToast">Create Event</button>
+                <div class="dropdown-rem">
+                    <button @click="toggleDropdownRem" class="reminder"><span class="fa fa-bell" style="font-size: 23px;padding: 8px 12px;color: aliceblue;"></span></button>
+                    <!-- <div v-if="isOpen" class="dropdown-content"> -->
+                    
+                    <div class="inner-scrol" v-if="isOpenRem">
+                        <div v-for="invitatio in invitations" class="dropdown-content-rem" v-on:click="openModal(invitatio)">
+                            <div class="inner-content">
+                                <div>Title: {{invitatio.title}}</div>
+                                <div>Time: {{invitatio.start}} - {{invitatio.end}}</div>
+                                <div>Invited by: {{invitatio.hostEmail}}</div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
                 <button @click="logout">
                 <!-- <div v-show="!isLarge" class="createEvent">Logout</div> -->
                     <div class="logout"><img src="http://localhost:5173/src/assets/logout.png" style="max-width:30px;max-height: 20px;padding: 0;"/></div>
@@ -91,6 +105,7 @@ export default {
             selectItem:'',
             renderComponent: true,
             isOpenMod: false,
+            isOpenRem: false,
             selectedInvitation: null,
         }
     },
@@ -133,6 +148,11 @@ export default {
     methods: {
         toggleDropdown() {
             this.isOpen = !this.isOpen;
+            console.log(this.invitations);
+        },
+        toggleDropdownRem() {
+            this.isOpenRem = !this.isOpenRem;
+            console.log(this.invitations);
         },
         handleSelect(invitation) {
             // console.log(invitation);
@@ -152,21 +172,6 @@ export default {
                 }
             ];
         },
-        // triggerToast() {
-        //     const toast = useToast();
-            
-        //     toast("Login Successful !!", {
-        //     position: "bottom-right",
-        //     timeout: 3000,
-        //     closeOnClick: true,
-        //     pauseOnFocusLoss: true,
-        //     pauseOnHover: true,
-        //     hideProgressBar: true,
-        //     closeButton: "button",
-        //     icon: "far fa-thumbs-up",
-        //     rtl: false
-        //     });
-        //  },
          triggerToast(msg) {
             const toast = useToast();
             
@@ -280,6 +285,10 @@ export default {
             this.isOpenMod = true;
             this.selectedInvitation = invitation;
         },
+        // openModalRem(invitation) {
+        //     this.isOpenMod = true;
+        //     this.selectedInvitation = invitation;
+        // },
         closeModal() {
             this.isOpenMod = false;
         },
@@ -363,7 +372,7 @@ export default {
     width: 100%;
     height: 100%;
     background-color: rgba(0, 0, 0, 0.5);
-    z-index: 9999; 
+    z-index: 10; 
 }
 
 .nav{
@@ -374,12 +383,14 @@ export default {
     background: #2e7ef5;
     margin-bottom: 1rem;
     color: #000000;
+    overflow: hidden;
     box-shadow: -3px -3px 7px #ffffff73,
                2px 2px 5px rgba(94,104,121,0.288);
+    max-height: 70px;
 }
 .navright{
     display: flex;
-    justify-content: space-between;
+    justify-content: flex-end;
     align-items: center;
     margin: 0 10px;
     /* box-shadow: -3px -3px 7px #ffffff73,
@@ -399,7 +410,7 @@ export default {
 }
 
 .createEvent{
-    margin: 0 10px;
+    margin: 0 0 0 10px;
   max-width: 450px;
   padding: 10px 16px;
   font-size: 1.1rem;
@@ -410,6 +421,17 @@ export default {
   outline: none;
   cursor: pointer;
   color: #e9eaf0;
+}
+
+.reminder{
+    border-radius: 5px;
+  border: none;
+  outline: none;
+  cursor: pointer;
+  /* text-align: center; */
+  background: #000000;
+  margin-right: 15px;
+  margin-bottom: 9px;
 }
 
 .logout{
@@ -548,9 +570,42 @@ export default {
   margin-top: 10px;
 }
 
+.dropdown-rem {
+  display: flex;
+  flex-direction: column;
+  /* border: 2px solid black; */
+  /* text-align: right; */
+  max-width: 300px;
+  margin-left: 20px;
+  margin-top: 10px;
+}
+
+.dropdown-content-rem {
+    display: flex;
+  flex-direction: row;
+  max-height: 200px;
+  /* position: absolute;
+  top: 70px;
+    right: 0; */
+  background-color: #232323;
+  color: white;
+  min-width: 100px;
+  max-width: 300px;
+  margin-right: 20px;
+  box-shadow: 0px 8px 16px 0px rgba(255, 255, 255, 0.2);
+}
+
 .inner-scroll{
-    max-height: 320px;
+    max-height: 220px;
   overflow-y: auto;
+}
+.inner-scrol{
+    max-height: 220px;
+  overflow-y: auto;
+  position: absolute;
+  top: 70px;
+    right: 0;
+    z-index: 11;
   /* padding: 5px 10px;
   background-color: #c4c4c4; */
 

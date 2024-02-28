@@ -88,7 +88,7 @@ import { useToast } from "vue-toastification";
                // this.$cookies.set('email', response.data.email, { expires: '1d' });
                this.triggerToast();
                
-               this.$router.push('/home');
+               this.$router.push('/aghome');
             } catch (e) {
                console.log(e)
             }

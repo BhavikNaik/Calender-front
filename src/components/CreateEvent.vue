@@ -142,11 +142,11 @@ export default {
 
             this.addEmail();
 
-            // const startDate = new Date(this.startTime);
+            //this.startTime = new Date(this.startTime);
             // startDate.setHours(startDate.getHours() + 5, startDate.getMinutes() + 30);
 
             // // Convert end time to IST
-            // const endDate = new Date(this.endTime);
+            //this.endTime = new Date(this.endTime);
             // endDate.setHours(endDate.getHours() + 5, endDate.getMinutes() + 30);
             // this.getEmail();
             console.log('Form: ', this.ename,"",this.description,"",this.startTime,"",this.endTime,"",this.mails,"",this.host);
@@ -154,8 +154,8 @@ export default {
                 const response = await axios.post(`http://localhost:3000/api/create-event`, {
                     title: this.ename,
                     description: this.description,
-                    startDate: startTime,
-                    endDate: endTime,
+                    startDate: this.startTime,
+                    endDate: this.endTime,
                     emails: this.mails,
                     host: this.host,
                 },{withCredentials: true});
