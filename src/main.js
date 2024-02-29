@@ -31,8 +31,8 @@ const router = createRouter({
         { path: '/', component: reg },
         { path: '/login', component: login, name: 'Login' },
         { path: '/home', component: HomeVue, meta: { requiresAuth: true }},
-        { path: '/aghome', component: AghomeVue, meta: { requiresAuth: true }},
-        { path: '/adhome', component: AdhomeVue, meta: { requiresAuth: true }},
+        { path: '/aghome', name: 'AghomeVue', component: AghomeVue, meta: { requiresAuth: true, role: 'Agent' }},
+        { path: '/adhome', name: 'AdhomeVue', component: AdhomeVue, meta: { requiresAuth: true, role: 'Admin' }},
         // meta: { requiresAuth: true }
     ]
 });
@@ -50,9 +50,28 @@ router.beforeEach(async (to, from, next) => {
             // }
 
             const response = await axios.get(`http://localhost:3000/api/home`,{withCredentials:true});
-            if (response.data.success) {
-                console.log("hai bhai",response)
-                next();
+            // if (response.data.success && response.data.role === 'Admin') {
+            //     console.log("hai bhai",response);
+            //     next({ name: 'AdhomeVue' });
+            // }else if(response.data.success && response.data.role === 'Agent'){
+            //     console.log("hai bhai",response);
+            //     next({ name: 'AghomeVue' });
+            if(response.data.success){
+                if (response.data.role === 'Admin' && to.name !== 'AghomeVue') {
+                    console.log("hai bhai", response);
+                    next();
+                } else if (response.data.role === 'Agent' && to.name !== 'AdhomeVue') {
+                    console.log("hai bhai", response);
+                    next();
+                } else {
+                    next(false); // Avoid infinite loop by not redirecting
+                }
+
+                // if (response.data.role === 'Admin') {
+                //     next({ name: 'AdhomeVue' });
+                // } else {
+                //     next({ name: 'AghomeVue' });
+                // }
             } else {
                 console.log("thoda problem hai bhai",response)
                 next({ name: 'Login' });
@@ -78,7 +97,7 @@ router.beforeEach(async (to, from, next) => {
 
 // Use the components
 app.component('VCalendar', Calendar)
-app.component('VDatePicker', DatePicker)
+//app.component('VDatePicker', DatePicker)
 // app.component('vue-table', VueTable);
 
 app.mount('#app')

@@ -87,8 +87,16 @@ import { useToast } from "vue-toastification";
                // Store email in cookie
                // this.$cookies.set('email', response.data.email, { expires: '1d' });
                this.triggerToast();
+               const role = response.data.role;
+               if (role === 'Admin') {
+                  // If the user is an admin, redirect them to the admin page
+                  this.$router.push('/adhome');
+               } else {
+                  // If the user is an agent, redirect them to the agent page
+                  this.$router.push('/aghome');
+               }
                
-               this.$router.push('/aghome');
+               //this.$router.push('/aghome');
             } catch (e) {
                console.log(e)
             }

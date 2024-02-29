@@ -126,10 +126,10 @@
                   email: this.mail,
                   password: this.password,
                   name: this.name,
-                  //contactNo: this.combinedNo,
+                  phone_no: this.combinedNo,
                   // selected: this.selected,
                })
-               console.log(this.mail," ",this.password)
+               // console.log(this.mail," ",this.password)
                console.log(res.data)
                if(res.data.message === "Account created"){
                   this.$router.push('/login')
@@ -186,7 +186,7 @@
             //this.checkMail();
             // console.log('Form submitted!');
             console.log(this.name,"", this.mail, "", this.combinedNo, "", this.password, "", this.confpassword);
-            // this.register();
+            this.register();
 
             
          },

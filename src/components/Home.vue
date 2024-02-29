@@ -461,15 +461,16 @@ export default {
     display: flex;
     justify-content: space-between;
     align-items: center;
+    margin-bottom: 30px;
 }
 
 .norText{
     padding-top: 10px;
-    font-weight: 500;
-    font-size: 1.3rem;
+    font-weight: 600;
+    font-size: 1.4rem;
     text-align: left;
-    color: #5096ff;
-    text-shadow: 1px 1px 2px beige;
+    color: #d5e6ff;
+    text-shadow: 1px 1px 2px rgb(77, 76, 76);
 }
 
 .closeSymbol{
@@ -486,7 +487,7 @@ export default {
 
 .modsubmit{
     display: flex;
-    margin: 10px auto;
+    margin: 15px auto;
     padding: 8px 20px;
     color: #ffffff;
     font-weight: 500;
@@ -498,12 +499,13 @@ export default {
 }
 
 .modfield{
-  height: 50px;
+  height: 45px;
   width: 100%;
   min-width: 270px;
   display: flex;
   position: relative;
   margin: 15px 0 25px 0;
+  align-items: center;
 }
 
 .modfield input{
@@ -539,7 +541,7 @@ export default {
 .modfield2 input{
   height: 100%;
   width: 100%;
-  padding-left: 2rem;
+  padding-left: 2.5rem;
   /* outline: none; */
   border: none;
   font-size: 12px;
