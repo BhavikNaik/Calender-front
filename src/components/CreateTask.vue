@@ -8,7 +8,11 @@
                 <button class="closeSymbol" @click="close">&times;</button>
             </div>
             <div class="modfield">
-                <input type="text" v-model="ename" id="ename" placeholder="Title">
+                <!-- <input type="text" v-model="ename" id="ename" placeholder="Title"> -->
+                <select v-model="ename" id="ename" style="padding: 5px 10px; width: 100%; padding-left: 40px;font-size: 1rem;">
+                    <option class="inside-options" value="" disabled selected>Select Department</option>
+                    <option class="inside-options" v-for="dept in departments" :value="dept">{{ dept }}</option>
+                </select>
                 <span class="fas fa-heading"></span>
             </div>
             <div class="modfield">
@@ -47,6 +51,8 @@ export default {
             contactNo: '',
             titleError: '',
             startTimeError: '',
+            statuses: ['In-progress', 'Open', 'Closed', 'Waiting'],
+            departments: ['Pediatric', 'Gynaecologist', 'Radiology', 'Neurology']
         }
     },
     async mounted(){
@@ -173,6 +179,7 @@ export default {
   padding: 30px 50px;
   background-color: #302e2e;
 }
+
 
 
 </style>

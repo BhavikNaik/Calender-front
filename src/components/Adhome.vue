@@ -41,7 +41,7 @@
                             </div>
                             <div class="dropdown-content2" v-show="isDropdownOpen" v-if="!isCollapsed">
                                 <div class="modfield2">
-                                    <input type="text" id="phoneNumber" v-model="phoneNumber" placeholder="Search By Number..">
+                                    <input type="text" id="phoneNumber" v-model="phoneNumber" @change="this.getTasks(this.startDate,this.endDate, this.phoneNumber)" placeholder="Search By Number..">
                                     <span class="fas fa-search"></span>
                                 </div>
                                 <div class="modfield2">
@@ -61,23 +61,25 @@
                 <div class="table-container">
                     <div class="table">
                         <div class="table-head-all">
-                            <div class="head-single">TITLE</div>
                             <div class="head-single">DATE</div>
                             <div class="head-single">TIME</div>
-                            <div class="head-single">STATUS</div>
+                            <div class="head-single">TITLE</div>
                             <div class="head-single">DESCRIPTION</div>
-                            <div class="head-single">RELATED TO</div>
-                            <div class="head-single">CONTACT NUMBER</div>
+                            <div class="head-single">STATUS</div>
+                            <div class="head-single">CUSTOMER</div>
+                            <div class="head-single">AGENT</div>
                         </div>
                         <div class="table-body-all" v-for="event in gettasks" :key="event.id">
-                            <div class="body-single">{{ event.title }}</div>
                             <div class="body-single">{{ event.startDate }}</div>
                             <div class="body-single">{{ event.startTime }}</div>
+                            <div class="body-single">{{ event.title }}</div>
                             <!-- <div class="body-single">{{ event.time }}</div> -->
-                            <div class="body-single">{{ event.status }}</div>
                             <div class="body-single">{{ event.description }}</div>
+                            <div class="body-single">{{ event.status }}</div>
                             <div class="body-single">{{ event.related_to }}</div>
-                            <div class="body-single">{{ event.createrPhone }}</div>
+                            <span class="body-single" id="hoverAgent">{{ event.creatorName }}</span>
+                            <!-- @mouseover="showAgent(event)" @mouseleave="hideAgent(event)"-->
+                            <!-- <span v-if="hoveredEvents === event.id" id="agentDetails">{{ event.creatorPhone }},<br> {{ event.creatorMail }}</span>  -->
                         </div>
                     </div>
                 </div>
@@ -112,6 +114,9 @@ export default {
             phoneNumber:'',
             startDate: '',
             endDate: '',
+            isHovered: false,
+            hoveredEvents:'',
+            Id: '',
             tableData: [
                 { title: 'Alice', time: '2024-02-17 14:40', description: 'anything but not something random', status: 'in-progress' },
                 { title: 'Bob', time: '2024-02-17 16:40', description: 'anything something random', status: 'completed'},
@@ -154,7 +159,7 @@ export default {
                 this.startDate = todayUTC;
                 this.endDate = todayUTC;
             }
-            await this.getTasks(this.startDate, this.endDate);
+            await this.getTasks(this.startDate, this.endDate, this.phoneNumber);
         } catch (error) {
             console.error("errrr",error);
         }
@@ -198,6 +203,19 @@ export default {
                 console.error("errrr",error);
             }
         },
+        showAgent(e) {
+            //this.hoverContent = `Mail: ${e}.mail}, Name: ${data.name}`;
+           // this.isHovered = true;
+           //this.hoveredEvents[e.id]=true;
+           this.hoveredEvents = e.id;
+           this.Id = e.id;
+        },
+        hideAgent(e){
+            //this.isHovered = false;
+            //this.$set(this.hoveredEvents, e.id, false);
+            this.hoveredEvents = '';
+            this.Id = '';
+        },
         // async ifAuth(){
         //     try {
         //         const response = await axios.get('http://localhost:3000/home',{  withCredentials: true });
@@ -207,9 +225,13 @@ export default {
         //         console.error("errrr",error);
         //     }
         // },
-        async getTasks(startDate, endDate){
+        async getTasks(startDate, endDate, no=''){
             try {
-                const response = await axios.get(`http://localhost:3000/api/get-tasks?startDate=${startDate}&endDate=${endDate}`, {  withCredentials: true });
+                let url = `http://localhost:3000/api/get-tasks?startDate=${startDate}&endDate=${endDate}`;
+                if(no != ''){
+                    url += `&phone_no=${no}`;
+                }
+                const response = await axios.get(url, {  withCredentials: true });
                 const userData = response.data;
                 console.log(userData); 
                 this.gettasks = [];
@@ -227,7 +249,10 @@ export default {
                         startTime: timePart,
                         status: item.status,
                         related_to: item.related_to,
-                        createrPhone: item.createrPhone,
+                        creatorPhone: item.creatorPhone,
+                        creatorName: item.creatorName,
+                        creatorMail: item.creatorMail,
+                        id: item._id,
                     });
                 });
                 // console.log("thid",this.invitestarts);
@@ -331,6 +356,7 @@ export default {
 
 .table-container {
     max-height: calc(100vh - 100px);
+    min-height: calc(100vh - 100px);
     overflow-x: auto;
     width: 100%;
     /* background-color: linear-gradient(to right, #0026ff, #0040ff, #0751f1, #cecece); */
@@ -339,7 +365,7 @@ export default {
 .table{
     /* border: 1px solid #747373; */
     margin: 0 10px;
-    min-width: 660px; 
+    min-width: 1000px; 
     display: flex;
     flex-direction: column;
     max-width: 100%;
@@ -359,30 +385,53 @@ export default {
     display: flex;
     flex-wrap: nowrap;
     flex-direction: row;
-    border-top: 1px solid #989898;
+    border-top: 1px solid rgb(196, 196, 196);
     background-color: #e5e5e5;
     color: black;
     border-collapse: collapse;
     /* margin: 10px 20px; */
 }
 
-
 .head-single{
-    /* border:1px solid #747373; */
+    border-right:1px solid #000000; 
     padding: 15px;
     font-size: 1.25rem;
     font-weight: 600;
-    flex: 1;
+    flex: 2 2;
     text-align: center;
     flex-wrap: nowrap;
 }
-
+.head-single:nth-child(4){
+    flex: 3 3;
+}
+.head-single:nth-child(2){
+    flex: 1 1;
+}
 .body-single{
     /* border:1px solid #747373; */
-    padding: 10px 20px;
-    align-items: center; /* Align items vertically */
-    flex: 1;
+    padding: 10px 15px;
+    align-items: center;
+    flex: 2 2;
     text-align: center;
+    max-height: 52px;
+    overflow: hidden;
+    white-space: nowrap;
+    text-overflow: ellipsis;
+    transition: max-height 0.3s ease;
+}
+
+.body-single:nth-child(4) {
+    flex: 3 3;
+}
+
+.body-single:nth-child(2) {
+    flex: 1 1;
+}
+
+.body-single:hover{
+    max-height: none;
+    overflow: auto;
+    white-space: wrap;
 }
 
 .table-body-all:hover{
@@ -438,9 +487,35 @@ export default {
   z-index: 1;
   font-size: 0.85rem;
   width: calc(100% - 20px);
+  text-align: center;
 }
 
 #endDate:hover::after{
     content: "Search by End Date";
+}
+
+/* #agentDetails{
+    display: block;
+    position: absolute;
+    top: 100%;
+    left: 0;
+    margin: 10px 20px;
+    background-color: black; 
+    z-index: 1;
+} */
+
+#hoverAgent:hover + #agentDetails::after{
+  display: block;
+  position: absolute;
+  top: 100%;
+  left: 0;
+  background-color: black;
+  color: #f9f9f9; /* Background color */
+  padding: 10px;
+  border-radius: 5px;
+  z-index: 1;
+  font-size: 0.85rem;
+  width: calc(100% - 20px);
+  text-align: center;
 }
 </style>

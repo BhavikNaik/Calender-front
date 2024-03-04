@@ -1,29 +1,33 @@
 <template>
     <div class="fullbgAg">
         <div class="nav">
-            <h2 style="display: flex;flex-wrap: nowrap;"><span class="fas fa-solid fa-calendar" style="margin-right: 8px;"></span>Calendar</h2>
+            <h2 style="display: flex;flex-wrap: nowrap;"><span class="fas fa-solid fa-calendar"
+                    style="margin-right: 8px;"></span>Calendar</h2>
             <!-- <span class="fas fa-sharp fa-regular fa-list" style="margin-right: 8px;"></span> -->
             <div class="navright">
                 <!-- <button class="createEvent" @click="getEvents">Get Events</button> -->
                 <!-- <button class="createEvent" @click="ifAuth">Email</button> -->
-                <button class="createEvent" @click="showToast">Create Event</button>
+                <!-- <button class="createEvent" @click="showToast">Create Event</button> -->
                 <div class="dropdown-rem">
-                    <button @click="toggleDropdownRem" class="reminder"><span class="fa fa-bell" style="font-size: 23px;padding: 8px 12px;color: aliceblue;"></span></button>
+                    <button @click="toggleDropdownRem" class="reminder"><span class="fa fa-bell"
+                            style="font-size: 23px;padding: 8px 12px;color: aliceblue;"></span></button>
                     <!-- <div v-if="isOpen" class="dropdown-content"> -->
-                    
+
                     <div class="inner-scrol" v-if="isOpenRem">
-                        <div v-for="invitatio in invitations" class="dropdown-content-rem" v-on:click="openModal(invitatio)">
+                        <div v-for="invitatio in invitations" class="dropdown-content-rem"
+                            v-on:click="openModal(invitatio)">
                             <div class="inner-content">
-                                <div>Title: {{invitatio.title}}</div>
-                                <div>Time: {{invitatio.start}} - {{invitatio.end}}</div>
-                                <div>Invited by: {{invitatio.hostEmail}}</div>
+                                <div>Title: {{ invitatio.title }}</div>
+                                <div>Time: {{ invitatio.start }} - {{ invitatio.end }}</div>
+                                <div>Invited by: {{ invitatio.hostEmail }}</div>
                             </div>
                         </div>
                     </div>
                 </div>
                 <button @click="logout">
-                <!-- <div v-show="!isLarge" class="createEvent">Logout</div> -->
-                    <div class="logout"><img src="http://localhost:5173/src/assets/logout.png" style="max-width:30px;max-height: 20px;padding: 0;"/></div>
+                    <!-- <div v-show="!isLarge" class="createEvent">Logout</div> -->
+                    <div class="logout"><img src="http://localhost:5173/src/assets/logout.png"
+                            style="max-width:30px;max-height: 20px;padding: 0;" /></div>
                 </button>
             </div>
         </div>
@@ -46,8 +50,13 @@
                         <div class="modal-labels">Title: </div>
                         <!-- <div class="modal-value" v-if="selectEvent.host !== userId">{{ selectEvent.description }}</div> -->
                         <div class="modfield2">
-                            <input type="text" v-model="selectEvent.title" id="title">
-                            <span class="fas fa-envelope"></span>
+                            <select v-model="selectEvent.title" style="padding: 5px 10px; width: 100%;">
+                                <!-- <option value="In-progress">In Progress</option>
+                                <option value="Open">Open</option>
+                                <option value="Waiting">Waiting</option>
+                                <option value="Closed">Closed</option> -->
+                                <option class="inside-options" v-for="dept in departments" :value="dept">{{ dept }}</option>
+                            </select>
                         </div>
                     </div>
                     <div class="inner-modal">
@@ -78,16 +87,17 @@
                         <div class="modal-labels">Status: </div>
                         <div class="modfield2">
                             <select v-model="selectEvent.status" style="padding: 5px 10px; width: 100%;">
-                                <option value="In-progress">In Progress</option>
+                                <!-- <option value="In-progress">In Progress</option>
                                 <option value="Open">Open</option>
                                 <option value="Waiting">Waiting</option>
-                                <option value="Closed">Closed</option>
+                                <option value="Closed">Closed</option> -->
+                                <option v-for="status in statuses" :value="status">{{ status }}</option>
                             </select>
                         </div>
                     </div>
                     <div class="buttons" style="margin: 1em 0.5em;">
                         <button class="inner-buttons2" @click="editEvent(selectEvent._id)">Update</button>
-                        <button class="inner-buttons2" @click="deleteEvent(selectEvent.id)">Delete</button>
+                        <!-- <button class="inner-buttons2" @click="deleteEvent(selectEvent.id)">Delete</button> -->
                     </div>
                 </div>
             </div>
@@ -124,52 +134,68 @@
                     </button>
                     <div :class="{ 'collapsed': isCollapsed }">
                         <div>
-                            <div class="inner-links"><span class="fas fa-solid fa-calendar" style="margin-right: 1rem;"></span><span v-if="!isCollapsed">Home</span></div> 
-                            <div class="inner-links"><span class="fas fa-solid fa-plus" style="margin-right: 1rem;"></span><span v-if="!isCollapsed" @click="showToast">Create Event</span></div>
+                            <div class="inner-links"><span class="fas fa-solid fa-calendar"
+                                    style="margin-right: 1rem;"></span><span v-if="!isCollapsed">Home</span></div>
+                            <div class="inner-links"><span class="fas fa-solid fa-plus"
+                                    style="margin-right: 1rem;"></span><span v-if="!isCollapsed" @click="showToast">Create
+                                    Event</span></div>
                             <div class="inner-links" style="justify-content: space-between;">
                                 <span>
                                     <span class="fas fa-solid fa-filter" style="margin-right: 1rem;"></span>
                                     <span v-if="!isCollapsed">Filters</span>
                                 </span>
-                                <button v-if="!isCollapsed" class="dropdown-toggle" @click="toggleDropdownFilter" style="background:none;cursor: pointer;border: none;outline: none;"><span class="fas fa-chevron-down"></span></button>
+                                <button v-if="!isCollapsed" class="dropdown-toggle" @click="toggleDropdownFilter"
+                                    style="background:none;cursor: pointer;border: none;outline: none;"><span
+                                        class="fas fa-chevron-down"></span></button>
                             </div>
                             <div class="dropdown-content2" v-show="isDropdownOpen" v-if="!isCollapsed">
-                                <div class="modfield3">
+                                <!-- <div class="modfield3">
                                     <input type="text" id="phoneNumber" v-model="phoneNumber" placeholder="Search By Number..">
                                     <span class="fas fa-search"></span>
-                                </div>
+                                </div> -->
                                 <div class="modfield3">
-                                    <input type="date" v-model="startDate" id="startDate" @change="this.getTasks(this.startDate,this.endDate)">
+                                    <input type="date" v-model="startDate" id="startDate"
+                                        @change="this.getTasks(this.startDate, this.endDate)">
                                     <span class="fas fa-clock"></span>
                                 </div>
                                 <div class="modfield3">
-                                    <input type="date" v-model="endDate" id="endDate" @change="this.getTasks(this.startDate,this.endDate)">
+                                    <input type="date" v-model="endDate" id="endDate"
+                                        @change="this.getTasks(this.startDate, this.endDate)">
                                     <span class="fas fa-clock"></span>
                                 </div>
                             </div>
-                            <div class="inner-links"><span class="fas fa-sign-out-alt" style="margin-right: 1rem;"></span><span v-if="!isCollapsed" @click="logout">Logout</span></div>
-                            
+                            <div class="inner-links"><span class="fas fa-sign-out-alt"
+                                    style="margin-right: 1rem;"></span><span v-if="!isCollapsed"
+                                    @click="logout">Logout</span></div>
+
                         </div>
                     </div>
                 </div>
                 <div class="table-container">
                     <div class="table">
                         <div class="table-head-all">
-                            <div class="head-single">TITLE</div>
                             <div class="head-single">DATE</div>
                             <div class="head-single">TIME</div>
-                            <div class="head-single">STATUS</div>
+                            <div class="head-single">TITLE</div>
                             <div class="head-single">DESCRIPTION</div>
-                            <div class="head-single">RELATED TO</div>
+                            <div class="head-single">STATUS</div>
+                            <div class="head-single">CUSTOMER</div>
                             <!-- <div class="head-single">CONTACT NUMBER</div> -->
                         </div>
                         <div class="table-body-all" v-for="event in gettasks" :key="event._id" @click="onEventClick(event)">
-                            <div class="body-single">{{ event.title }}</div>
                             <div class="body-single">{{ event.startDate }}</div>
                             <div class="body-single">{{ event.startTime }}</div>
+                            <div class="body-single">{{ event.title }}</div>
                             <!-- <div class="body-single">{{ event.time }}</div> -->
+                            <!-- <div class="body-single">{{ event.description }}</div> -->
+                            <div class="body-single">
+                                <!-- @mouseover="setHoveredEvent(event._id)" @mouseleave="clearHoveredEvent" -->
+                                {{ event.description }}
+                                <!-- <div v-if="hoveredEventId === event._id" class="description-box">
+                                    {{ event.description }}
+                                </div> -->
+                            </div>
                             <div class="body-single">{{ event.status }}</div>
-                            <div class="body-single">{{ event.description }}</div>
                             <div class="body-single">{{ event.related_to }}</div>
                             <!-- <div class="body-single">{{ event.createrPhone }}</div> -->
                         </div>
@@ -197,14 +223,14 @@ export default {
             isLarge: true,
             userId: '',
             isOpen: false,
-            selectEvent:[],
+            selectEvent: [],
             gettasks: [],
             eventstarts: [],
             isOpenMod: false,
             isOpenRem: false,
             isCollapsed: false,
             isDropdownOpen: false,
-            phoneNumber:'',
+            phoneNumber: '',
             startDate: '',
             endDate: '',
             status: '',
@@ -212,24 +238,9 @@ export default {
             todayTime: '',
             startTimeError: '',
             titleError: '',
-            tableData: [
-                { title: 'Alice', time: '2024-02-17 14:40', description: 'anything but not something random', status: 'in-progress' },
-                { title: 'Bob', time: '2024-02-17 16:40', description: 'anything something random', status: 'completed'},
-                { title: 'Alice', time: '2024-02-17 14:40', description: 'anything but not something random', status: 'in-progress' },
-                { title: 'Bob', time: '2024-02-17 16:40', description: 'anything something random', status: 'completed'},
-                { title: 'Random', time: '2024-02-17 14:40', description: 'anything but not something random', status: 'in-progress' },
-                { title: 'Bob', time: '2024-02-17 16:40', description: 'anything something random', status: 'completed'},
-                { title: 'Alice', time: '2024-02-17 14:40', description: 'anything but not something random', status: 'in-progress' },
-                { title: 'Bob', time: '2024-02-17 16:40', description: 'anything something random', status: 'completed'},
-                { title: 'Alice', time: '2024-02-17 14:40', description: 'anything but not something random', status: 'in-progress' },
-                { title: 'Bob', time: '2024-02-17 16:40', description: 'anything something random', status: 'completed'},
-                { title: 'Alice', time: '2024-02-17 14:40', description: 'anything but not something random', status: 'in-progress' },
-                { title: 'Bob', time: '2024-02-17 16:40', description: 'anything something random', status: 'completed'},
-                { title: 'Alice', time: '2024-02-17 14:40', description: 'anything but not something random', status: 'in-progress' },
-                { title: 'Bob', time: '2024-02-17 16:40', description: 'anything something random', status: 'completed'},
-                { title: 'Alice', time: '2024-02-17 14:40', description: 'anything but not something random', status: 'in-progress' },
-                { title: 'Bob', time: '2024-02-17 16:40', description: 'anything something random', status: 'completed'},
-            ]
+            hoveredEventId: '', 
+            statuses: ['In-progress', 'Open', 'Waiting', 'Closed'],
+            departments: ['Pediatric', 'Gynaecologist', 'Radiology', 'Neurology']
         }
     },
     // computed:{
@@ -242,28 +253,28 @@ export default {
     // },
     async mounted() {
         try {
-            const response = await axios.get('http://localhost:3000/api/home',{  withCredentials: true });
+            const response = await axios.get('http://localhost:3000/api/home', { withCredentials: true });
             const userData = response.data;
-            console.log("ye",userData); // This will contain information about the currently logged-in user
+            console.log("ye", userData); // This will contain information about the currently logged-in user
             this.userId = response.data._id;
             this.createrPhone = response.data.phone_no;
             //await this.getInvitations();
             if (!this.startDate || !this.endDate) {
                 const today = new Date();
                 // console.log(today); 
-                const todayUTC = new Date(Date.UTC(today.getFullYear(), today.getMonth(), today.getDate())).toISOString().substring(0,10);
-                const todayUTCTime = new Date(Date.UTC(today.getFullYear(), today.getMonth(), today.getDate(),today.getHours(), today.getMinutes())).toISOString().substring(11,16);
+                const todayUTC = new Date(Date.UTC(today.getFullYear(), today.getMonth(), today.getDate())).toISOString().substring(0, 10);
+                const todayUTCTime = new Date(Date.UTC(today.getFullYear(), today.getMonth(), today.getDate(), today.getHours(), today.getMinutes())).toISOString().substring(11, 16);
                 this.startDate = todayUTC;
                 this.endDate = todayUTC;
                 const parts = todayUTC.split('-');
                 this.todayDate = `${parts[2]}-${parts[1]}-${parts[0]}`;
                 this.todayTime = todayUTCTime;
             }
-            await this.getTasks(this.startDate,this.endDate);
+            await this.getTasks(this.startDate, this.endDate);
         } catch (error) {
-            console.error("errrr",error);
+            console.error("errrr", error);
         }
-        
+
     },
     methods: {
         toggleDropdownRem() {
@@ -278,61 +289,61 @@ export default {
         },
         validateTitle() {
             // const emailRegex = /^[a-zA-Z0-9._-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,6}$/;
-            if(this.title.length < 1) {
-               //alert('Invalid email address');
-               this.titleError=false;
-            } else{
-               this.titleError=true;
+            if (this.title.length < 1) {
+                //alert('Invalid email address');
+                this.titleError = false;
+            } else {
+                this.titleError = true;
             }
-         },
-         validateStartDate() {
-            if(this.startDate.length < 6) {
-               //alert('Password must be at least 6 characters');
-               this.startTimeError=false;
-            } else{
-               this.startTimeError=true;
+        },
+        validateStartDate() {
+            if (this.startDate.length < 6) {
+                //alert('Password must be at least 6 characters');
+                this.startTimeError = false;
+            } else {
+                this.startTimeError = true;
             }
-         },
-         validateStartTime() {
-            if(this.startTime.length < 4) {
-               //alert('Password must be at least 6 characters');
-               this.startTimeError=false;
-            } else{
-               this.startTimeError=true;
+        },
+        validateStartTime() {
+            if (this.startTime.length < 4) {
+                //alert('Password must be at least 6 characters');
+                this.startTimeError = false;
+            } else {
+                this.startTimeError = true;
             }
-         },
-         triggerToast(msg) {
+        },
+        triggerToast(msg) {
             const toast = useToast();
-            
+
             toast(`${msg}`, {
-            position: "bottom-right",
-            timeout: 2500,
-            closeOnClick: true,
-            pauseOnFocusLoss: true,
-            pauseOnHover: true,
-            hideProgressBar: true,
-            closeButton: "button",
-            icon: "far fa-thumbs-up",
-            rtl: false
+                position: "bottom-right",
+                timeout: 2500,
+                closeOnClick: true,
+                pauseOnFocusLoss: true,
+                pauseOnHover: true,
+                hideProgressBar: true,
+                closeButton: "button",
+                icon: "far fa-thumbs-up",
+                rtl: false
             });
-         },
+        },
         async logout() {
             try {
-                const response = await axios.post('http://localhost:3000/auth/logout', null, {  withCredentials: true });
+                const response = await axios.post('http://localhost:3000/auth/logout', null, { withCredentials: true });
                 const userData = response.data;
                 console.log(userData);
                 this.triggerToast('Logout Successful !!');
-                
+
                 this.$router.push('/login')
             } catch (error) {
-                console.error("errrr",error);
+                console.error("errrr", error);
             }
         },
-        async getTasks(startDate, endDate){
+        async getTasks(startDate, endDate) {
             try {
-                const response = await axios.get(`http://localhost:3000/api/get-tasks?startDate=${startDate}&endDate=${endDate}`, {  withCredentials: true });
+                const response = await axios.get(`http://localhost:3000/api/get-tasks?startDate=${startDate}&endDate=${endDate}`, { withCredentials: true });
                 const userData = response.data;
-                console.log(userData); 
+                console.log(userData);
                 this.gettasks = [];
 
                 userData.forEach(item => {
@@ -355,7 +366,7 @@ export default {
                 // console.log("thid",this.invitestarts);
 
             } catch (error) {
-                console.error("errrr",error);
+                console.error("errrr", error);
             }
         },
         onEventClick(event) {
@@ -374,6 +385,12 @@ export default {
             let partss = this.selectEvent.startDate.split('-');
             this.selectEvent.startDate = `${partss[2]}-${partss[1]}-${partss[0]}`;
             this.selectEvent = [];
+        },
+        setHoveredEvent(eventId) {
+            this.hoveredEventId = eventId;
+        },
+        clearHoveredEvent() {
+            this.hoveredEventId = '';
         },
         openModal(invitation) {
             this.isOpenMod = true;
@@ -415,7 +432,7 @@ export default {
                     status: this.selectEvent.status,
                     //related_to: this.selectEvent.related_to,
                 }
-                , { withCredentials: true });
+                    , { withCredentials: true });
                 const userData = response.data;
                 console.log("get wala", userData);
                 this.triggerToast("Task Updated !!");
@@ -441,12 +458,12 @@ export default {
 </script>
 
 <style scoped>
-.fullbgAg{
+.fullbgAg {
     background-color: linear-gradient(to right, #0026ff, #0040ff, #0751f1, #cecece);
     height: 100vh;
 }
 
-.main-container{
+.main-container {
     display: flex;
     flex-direction: row;
     min-height: calc(100vh - 100px);
@@ -475,7 +492,7 @@ export default {
     padding: 5px 8px;
 }
 
-.inner-links{
+.inner-links {
     display: flex;
     flex-direction: row;
     align-items: center;
@@ -484,10 +501,11 @@ export default {
     font-weight: 650;
 }
 
-.inner-links:hover{
+.inner-links:hover {
     cursor: pointer;
     color: #d75858;
 }
+
 .table-container {
     max-height: calc(100vh - 100px);
     overflow-x: auto;
@@ -495,16 +513,18 @@ export default {
     /* background-color: linear-gradient(to right, #0026ff, #0040ff, #0751f1, #cecece); */
 }
 
-.table{
+.table {
     /* border: 1px solid #747373; */
     margin: 0 10px;
-    min-width: 660px; 
+    min-width: 860px;
     display: flex;
     flex-direction: column;
     max-width: 100%;
+    min-height: calc(100vh - 200px);
+    font-family: 'Courier New', Courier, monospace;
 }
 
-.table-head-all{
+.table-head-all {
     display: flex;
     flex-wrap: nowrap;
     flex-direction: row;
@@ -514,11 +534,11 @@ export default {
     border-bottom: 3px solid rgba(255, 255, 255);
 }
 
-.table-body-all{
+.table-body-all {
     display: flex;
     flex-wrap: nowrap;
     flex-direction: row;
-    border-top: 1px solid #989898;
+    border-top: 1px solid rgb(196, 196, 196);
     background-color: #e5e5e5;
     color: black;
     border-collapse: collapse;
@@ -526,80 +546,117 @@ export default {
 }
 
 
-.head-single{
-    /* border:1px solid #747373; */
+.head-single {
+    border-right: 1px solid #000000;
     padding: 15px;
     font-size: 1.25rem;
     font-weight: 600;
-    flex: 1;
+    flex: 2 2;
     text-align: center;
     flex-wrap: nowrap;
 }
 
-.body-single{
-    /* border:1px solid #747373; */
-    padding: 10px 20px;
-    align-items: center;
-    flex: 1;
-    text-align: center;
+.head-single:nth-child(4) {
+    flex: 3 3;
 }
 
-.table-body-all:hover{
+.head-single:nth-child(2) {
+    flex: 1 1;
+}
+
+.body-single {
+    /* border:1px solid #747373; */
+    padding: 10px 15px;
+    align-items: center;
+    flex: 2 2;
+    text-align: center;
+    /* position: relative; */
+    /* display: -webkit-box; For WebKit-based browsers */
+    /* -webkit-line-clamp: 2; */
+    max-height: 52px;
+    overflow: hidden;
+    white-space: nowrap;
+    text-overflow: ellipsis;
+    transition: max-height 0.3s ease;
+}
+
+.body-single:nth-child(4) {
+    flex: 3 3;
+}
+
+.body-single:nth-child(2) {
+    flex: 1 1;
+}
+
+.body-single:hover {
+    max-height: none;
+    overflow: auto;
+    white-space: wrap;
+}
+.table-body-all:hover {
     /* border:1px solid #747373; */
     color: rgb(0, 0, 0);
     background-color: #d0d0d0;
-    
 }
-
-.modfield3{
-  height: 40px;
-  max-width: 200px;
-  /* min-width: 200px; */
-  display: flex;
-  position: relative;
-  margin: 10px 20px;
-  align-items: center;
-}
-
-.modfield3 input{
-  height: 100%;
-  width: 100%;
-  padding-left: 3rem;
-  padding-right: 20px;
-  outline: none;
-  border: none;
-  font-size: 15px;
-  background: #faf3f3;
-  color: #595959;
-  border-radius: 7px;
-  box-shadow: inset 2px 2px 5px #f9efef,
-              inset -5px -5px 10px #ffffff73;
-}
-
-.modfield3 span{
+.description-box {
   position: absolute;
-  color: #595959;
-  line-height: 40px;
-  margin-left: 10px;
+  background-color: black;
+  color: white;
+  padding: 10px;
+  border-radius: 5px;
+  bottom: 0;
+}
+
+.modfield3 {
+    height: 40px;
+    max-width: 200px;
+    /* min-width: 200px; */
+    display: flex;
+    position: relative;
+    margin: 10px 20px;
+    align-items: center;
+}
+
+.modfield3 input {
+    height: 100%;
+    width: 100%;
+    padding-left: 3rem;
+    padding-right: 20px;
+    outline: none;
+    border: none;
+    font-size: 15px;
+    background: #faf3f3;
+    color: #595959;
+    border-radius: 7px;
+    box-shadow: inset 2px 2px 5px #f9efef,
+        inset -5px -5px 10px #ffffff73;
+}
+
+.modfield3 span {
+    position: absolute;
+    color: #595959;
+    line-height: 40px;
+    margin-left: 10px;
 }
 
 #startDate:hover::after,
 #endDate:hover::after {
-  content: "Search by Start Date";
-  display: block;
-  position: absolute;
-  top: 100%;
-  left: 0;
-  background-color: black;
-  color: #f9f9f9; /* Background color */
-  padding: 10px;
-  border-radius: 5px;
-  z-index: 1;
-  font-size: 0.85rem;
-  width: calc(100% - 20px);
+    content: "Search by Start Date";
+    display: block;
+    position: absolute;
+    top: 100%;
+    left: 0;
+    background-color: black;
+    color: #f9f9f9;
+    /* Background color */
+    padding: 10px;
+    border-radius: 5px;
+    z-index: 1;
+    font-size: 0.85rem;
+    width: calc(100% - 20px);
+    text-align: center;
 }
 
-#endDate:hover::after{
+#endDate:hover::after {
     content: "Search by End Date";
-}
-</style>
+}</style>

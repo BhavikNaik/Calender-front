@@ -552,6 +552,31 @@ export default {
               inset -5px -5px 10px #ffffff73;
 }
 
+.modfield select{
+  height: 100%;
+  width: 100%;
+  padding-left: 2.5rem;
+  /* outline: none; */
+  border: none;
+  font-size: 12px;
+  background: #faf3f3;
+  color: #595959;
+  border-radius: 7px;
+  box-shadow: inset 2px 2px 5px #f9efef,
+              inset -5px -5px 10px #ffffff73;
+}
+.inside-options {
+    padding-left: 5rem;
+    font-size: 1rem;
+    background: #faf3f3;
+    color: #595959;
+    border-radius: 7px;
+    box-shadow: inset 2px 2px 5px #f9efef, inset -5px -5px 10px #ffffff73;
+}
+
+/* .inside-options:checked {
+    padding-left: 2rem;
+} */
 .modfield2 span{
   position: absolute;
   left: 10px;
