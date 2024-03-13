@@ -180,23 +180,25 @@
                             <div class="head-single">DESCRIPTION</div>
                             <div class="head-single">STATUS</div>
                             <div class="head-single">CUSTOMER</div>
+                            <div class="head-single">SERVICE</div>
+                            <div class="head-single">RESOURCE</div>
+                            <div class="head-single">AGENT</div>
                             <!-- <div class="head-single">CONTACT NUMBER</div> -->
                         </div>
                         <div class="table-body-all" v-for="event in gettasks" :key="event._id" @click="onEventClick(event)">
                             <div class="body-single">{{ event.startDate }}</div>
-                            <div class="body-single">{{ event.startTime }}</div>
+                            <div class="body-single">{{ event.startTime }} - {{ event.endTime }}</div>
                             <div class="body-single">{{ event.title }}</div>
-                            <!-- <div class="body-single">{{ event.time }}</div> -->
-                            <!-- <div class="body-single">{{ event.description }}</div> -->
-                            <div class="body-single">
+                            <div class="body-single">{{ event.description }}</div>
                                 <!-- @mouseover="setHoveredEvent(event._id)" @mouseleave="clearHoveredEvent" -->
-                                {{ event.description }}
                                 <!-- <div v-if="hoveredEventId === event._id" class="description-box">
                                     {{ event.description }}
                                 </div> -->
-                            </div>
                             <div class="body-single">{{ event.status }}</div>
                             <div class="body-single">{{ event.related_to }}</div>
+                            <div class="body-single">{{ event.service }}</div>
+                            <div class="body-single">{{ event.resource }}</div>
+                            <span class="body-single" id="hoverAgent">{{ event.creatorName }}</span>
                             <!-- <div class="body-single">{{ event.createrPhone }}</div> -->
                         </div>
                     </div>
@@ -208,13 +210,17 @@
 
 <script>
 // import { useToast } from "vue-toastification";
-import CreateTask from './CreateTask.vue'
+import CreateTask from './CreateTask.vue';
+import DeptVue from './DeptVue.vue';
+import DoctorVue from './DoctorVue.vue';
 import axios from 'axios';
 import { useToast } from 'vue-toastification';
 
 export default {
     components: {
         CreateTask,
+        DeptVue,
+        DoctorVue
     },
     data() {
         return {
@@ -279,7 +285,7 @@ export default {
     methods: {
         toggleDropdownRem() {
             this.isOpenRem = !this.isOpenRem;
-            console.log(this.invitations);
+            //console.log(this.invitations);
         },
         toggleNavbar() {
             this.isCollapsed = !this.isCollapsed;
@@ -341,14 +347,15 @@ export default {
         },
         async getTasks(startDate, endDate) {
             try {
-                const response = await axios.get(`http://localhost:3000/api/get-tasks?startDate=${startDate}&endDate=${endDate}`, { withCredentials: true });
+                const response = await axios.get(`http://localhost:3000/api/get-bookings?startDate=${startDate}&endDate=${endDate}`, { withCredentials: true });
                 const userData = response.data;
                 console.log(userData);
                 this.gettasks = [];
 
                 userData.forEach(item => {
-                    let datePart = item.dueDate.slice(0, 10);
-                    let timePart = item.dueDate.slice(11, 16);
+                    let datePart = item.startDate.slice(0, 10);
+                    let starttimePart = item.startDate.slice(11, 16);
+                    let endtimePart = item.endDate.slice(11,16);
                     const parts = datePart.split('-');
                     let startDate = `${parts[2]}-${parts[1]}-${parts[0]}`;
 
@@ -356,11 +363,15 @@ export default {
                         title: item.title,
                         description: item.description,
                         startDate: startDate,
-                        startTime: timePart,
+                        startTime: starttimePart,
+                        endTime: endtimePart,
                         status: item.status,
                         related_to: item.related_to,
-                        createrPhone: item.createrPhone,
-                        _id: item._id,
+                        creatorName: item.creatorName,
+                        service: item.service,
+                        resource: item.resource,
+                        customerId: item.customerId,
+                        id: item._id,
                     });
                 });
                 // console.log("thid",this.invitestarts);
@@ -374,10 +385,10 @@ export default {
             // this.selectEvent.start = this.dateTimeChangeFormat(this.selectEvent.start);
             // this.selectEvent.end = this.dateTimeChangeFormat(this.selectEvent.end);
             console.log(this.selectEvent);
-            let partss = this.selectEvent.startDate.split('-');
-            this.selectEvent.startDate = `${partss[2]}-${partss[1]}-${partss[0]}`;
+            // let partss = this.selectEvent.startDate.split('-');
+            // this.selectEvent.startDate = `${partss[2]}-${partss[1]}-${partss[0]}`;
 
-            this.isOpen = true;
+            //this.isOpen = true;
         },
         closeModaledit() {
             //this.showDialog = false;
@@ -470,8 +481,8 @@ export default {
 }
 
 .app {
-    max-width: 300px;
-    width: 250px;
+    max-width: 235px;
+    width: 220px;
     max-height: calc(100vh - 100px);
     background-color: #e5e5e5;
     color: rgb(0, 0, 0);
@@ -516,7 +527,7 @@ export default {
 .table {
     /* border: 1px solid #747373; */
     margin: 0 10px;
-    min-width: 860px;
+    min-width: 1280px;
     display: flex;
     flex-direction: column;
     max-width: 100%;
@@ -558,11 +569,13 @@ export default {
 
 .head-single:nth-child(4) {
     flex: 3 3;
+    padding: 15px 5px;
 }
 
-.head-single:nth-child(2) {
-    flex: 1 1;
-}
+/* .head-single:nth-child(6) {
+    overflow-x: auto;
+    word-break: break-all;
+} */
 
 .body-single {
     /* border:1px solid #747373; */
@@ -570,9 +583,6 @@ export default {
     align-items: center;
     flex: 2 2;
     text-align: center;
-    /* position: relative; */
-    /* display: -webkit-box; For WebKit-based browsers */
-    /* -webkit-line-clamp: 2; */
     max-height: 52px;
     overflow: hidden;
     white-space: nowrap;
@@ -582,11 +592,12 @@ export default {
 
 .body-single:nth-child(4) {
     flex: 3 3;
+    padding: 10px 5px;
 }
 
-.body-single:nth-child(2) {
-    flex: 1 1;
-}
+/* .body-single:nth-child(6) {
+    word-break: break-all;
+} */
 
 .body-single:hover {
     max-height: none;

@@ -30,16 +30,16 @@
                     </button>
                     <div :class="{ 'collapsed': isCollapsed }">
                         <div>
-                            <div class="inner-links"><span class="fas fa-solid fa-calendar" style="margin-right: 1rem;"></span><span v-if="!isCollapsed">Home</span></div> 
+                            <div class="inner-links" @click="selectContent('home')"><span class="fas fa-solid fa-calendar" style="margin-right: 1rem;"></span><span v-if="!isCollapsed">Home</span></div> 
                             <!-- <div class="inner-links"><span class="fas fa-solid fa-plus" style="margin-right: 1rem;"></span><span v-if="!isCollapsed" @click="showToast">Create Event</span></div> -->
-                            <div class="inner-links" style="justify-content: space-between;">
+                            <div class="inner-links" style="justify-content: space-between;" v-if="selectedContent === 'home'">
                                 <span>
                                     <span class="fas fa-solid fa-filter" style="margin-right: 1rem;"></span>
                                     <span v-if="!isCollapsed">Filters</span>
                                 </span>
                                 <button v-if="!isCollapsed" class="dropdown-toggle" @click="toggleDropdownFilter" style="background:none;cursor: pointer;border: none;outline: none;"><span class="fas fa-chevron-down"></span></button>
                             </div>
-                            <div class="dropdown-content2" v-show="isDropdownOpen" v-if="!isCollapsed">
+                            <div class="dropdown-content2" v-show="isDropdownOpen" v-if="!isCollapsed && selectedContent === 'home'">
                                 <div class="modfield2">
                                     <input type="text" id="phoneNumber" v-model="phoneNumber" @change="this.getTasks(this.startDate,this.endDate, this.phoneNumber)" placeholder="Search By Number..">
                                     <span class="fas fa-search"></span>
@@ -53,12 +53,14 @@
                                     <span class="fas fa-clock"></span>
                                 </div>
                             </div>
+                            <div class="inner-links" @click="selectContent('dept')"><span class="fas fa-solid fa-heading" style="margin-right: 1rem;"></span><span v-if="!isCollapsed">Services</span></div> 
+                            <div class="inner-links" @click="selectContent('doc')"><span class="fas fa-solid fa-user" style="margin-right: 1rem;"></span><span v-if="!isCollapsed">Resources</span></div> 
                             <div class="inner-links"><span class="fas fa-sign-out-alt" style="margin-right: 1rem;"></span><span v-if="!isCollapsed" @click="logout">Logout</span></div>
                             
                         </div>
                     </div>
                 </div>
-                <div class="table-container">
+                <div class="table-container" v-if="selectedContent == 'home'">
                     <div class="table">
                         <div class="table-head-all">
                             <div class="head-single">DATE</div>
@@ -67,21 +69,31 @@
                             <div class="head-single">DESCRIPTION</div>
                             <div class="head-single">STATUS</div>
                             <div class="head-single">CUSTOMER</div>
+                            <div class="head-single">SERVICE</div>
+                            <div class="head-single">RESOURCE</div>
                             <div class="head-single">AGENT</div>
                         </div>
                         <div class="table-body-all" v-for="event in gettasks" :key="event.id">
                             <div class="body-single">{{ event.startDate }}</div>
-                            <div class="body-single">{{ event.startTime }}</div>
+                            <div class="body-single">{{ event.startTime }} - {{ event.endTime }}</div>
                             <div class="body-single">{{ event.title }}</div>
                             <!-- <div class="body-single">{{ event.time }}</div> -->
                             <div class="body-single">{{ event.description }}</div>
                             <div class="body-single">{{ event.status }}</div>
                             <div class="body-single">{{ event.related_to }}</div>
+                            <div class="body-single">{{ event.service }}</div>
+                            <div class="body-single">{{ event.resource }}</div>
                             <span class="body-single" id="hoverAgent">{{ event.creatorName }}</span>
                             <!-- @mouseover="showAgent(event)" @mouseleave="hideAgent(event)"-->
                             <!-- <span v-if="hoveredEvents === event.id" id="agentDetails">{{ event.creatorPhone }},<br> {{ event.creatorMail }}</span>  -->
                         </div>
                     </div>
+                </div>
+                <div v-else-if="selectedContent === 'dept'" class="table-container">
+                    <DeptVue />
+                </div>
+                <div v-else-if="selectedContent === 'doc'" class="table-container">
+                    <DoctorVue />
                 </div>
             </div>
         </div>
@@ -91,12 +103,16 @@
 <script>
 // import { useToast } from "vue-toastification";
 import CreateTask from './CreateTask.vue'
+import DeptVue from './DeptVue.vue';
+import DoctorVue from './DoctorVue.vue';
 import axios from 'axios';
 import { useToast } from 'vue-toastification';
 
 export default {
     components: {
         CreateTask,
+        DeptVue,
+        DoctorVue
     },
     data() {
         return {
@@ -117,6 +133,7 @@ export default {
             isHovered: false,
             hoveredEvents:'',
             Id: '',
+            selectedContent:'home',
             tableData: [
                 { title: 'Alice', time: '2024-02-17 14:40', description: 'anything but not something random', status: 'in-progress' },
                 { title: 'Bob', time: '2024-02-17 16:40', description: 'anything something random', status: 'completed'},
@@ -168,7 +185,10 @@ export default {
     methods: {
         toggleDropdownRem() {
             this.isOpenRem = !this.isOpenRem;
-            console.log(this.invitations);
+            //console.log(this.invitations);
+        },
+        selectContent(content) {
+            this.selectedContent = content;
         },
         toggleNavbar() {
             this.isCollapsed = !this.isCollapsed;
@@ -227,7 +247,7 @@ export default {
         // },
         async getTasks(startDate, endDate, no=''){
             try {
-                let url = `http://localhost:3000/api/get-tasks?startDate=${startDate}&endDate=${endDate}`;
+                let url = `http://localhost:3000/api/get-bookings/?startDate=${startDate}&endDate=${endDate}`;
                 if(no != ''){
                     url += `&phone_no=${no}`;
                 }
@@ -237,8 +257,9 @@ export default {
                 this.gettasks = [];
 
                 userData.forEach(item => {
-                    let datePart = item.dueDate.slice(0, 10);
-                    let timePart = item.dueDate.slice(11, 16);
+                    let datePart = item.startDate.slice(0, 10);
+                    let starttimePart = item.startDate.slice(11, 16);
+                    let endtimePart = item.endDate.slice(11,16);
                     const parts = datePart.split('-');
                     let startDate = `${parts[2]}-${parts[1]}-${parts[0]}`;
 
@@ -246,12 +267,14 @@ export default {
                         title: item.title,
                         description: item.description,
                         startDate: startDate,
-                        startTime: timePart,
+                        startTime: starttimePart,
+                        endTime: endtimePart,
                         status: item.status,
                         related_to: item.related_to,
-                        creatorPhone: item.creatorPhone,
                         creatorName: item.creatorName,
-                        creatorMail: item.creatorMail,
+                        service: item.service,
+                        resource: item.resource,
+                        customerId: item.customerId,
                         id: item._id,
                     });
                 });
@@ -299,8 +322,8 @@ export default {
 }
 
 .app {
-    max-width: 300px;
-    width: 250px;
+    max-width: 235px;
+    width: 220px;
     max-height: calc(100vh - 100px);
     background-color: #e5e5e5;
     color: rgb(0, 0, 0);
@@ -365,7 +388,7 @@ export default {
 .table{
     /* border: 1px solid #747373; */
     margin: 0 10px;
-    min-width: 1000px; 
+    min-width: 1280px; 
     display: flex;
     flex-direction: column;
     max-width: 100%;
@@ -403,10 +426,11 @@ export default {
 }
 .head-single:nth-child(4){
     flex: 3 3;
+    padding: 15px 5px;
 }
-.head-single:nth-child(2){
+/* .head-single:nth-child(2){
     flex: 1 1;
-}
+} */
 .body-single{
     /* border:1px solid #747373; */
     padding: 10px 15px;
@@ -422,11 +446,12 @@ export default {
 
 .body-single:nth-child(4) {
     flex: 3 3;
+    padding: 10px 5px;
 }
 
-.body-single:nth-child(2) {
+/* .body-single:nth-child(2) {
     flex: 1 1;
-}
+} */
 
 .body-single:hover{
     max-height: none;

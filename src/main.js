@@ -6,6 +6,9 @@ import login from './components/Login.vue'
 import HomeVue from './components/Home.vue'
 import AghomeVue from './components/Aghome.vue'
 import AdhomeVue from './components/Adhome.vue'
+import DeptVue from './components/DeptVue.vue'
+import DoctorVue from './components/DoctorVue.vue'
+//import addHours from './components/addHours.vue'
 import './components/styles.css'
 import axios from 'axios'
 import Toast from 'vue-toastification'
@@ -33,6 +36,8 @@ const router = createRouter({
         { path: '/home', component: HomeVue, meta: { requiresAuth: true }},
         { path: '/aghome', name: 'AghomeVue', component: AghomeVue, meta: { requiresAuth: true, role: 'Agent' }},
         { path: '/adhome', name: 'AdhomeVue', component: AdhomeVue, meta: { requiresAuth: true, role: 'Admin' }},
+        { path: '/departments', name: 'DeptVue', component: DeptVue, meta: { requiresAuth: true, role: 'Admin' }},
+        { path: '/doctors', name: 'DoctorVue', component: DoctorVue, meta: { requiresAuth: true, role: 'Admin' }},
         // meta: { requiresAuth: true }
     ]
 });

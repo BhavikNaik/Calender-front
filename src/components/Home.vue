@@ -499,12 +499,12 @@ export default {
 }
 
 .modfield{
-  height: 45px;
+  height: 40px;
   width: 100%;
   min-width: 270px;
   display: flex;
   position: relative;
-  margin: 15px 0 25px 0;
+  margin: 15px 0 20px 0;
   align-items: center;
 }
 
