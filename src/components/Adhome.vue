@@ -45,11 +45,11 @@
                                     <span class="fas fa-search"></span>
                                 </div>
                                 <div class="modfield2">
-                                    <input type="date" v-model="startDate" id="startDate" @change="this.getTasks(this.startDate,this.endDate)">
+                                    <input type="date" v-model="startDate" id="startDate" @change="this.getTasks(this.startDate,this.endDate,this.phoneNumber, this.resName)">
                                     <span class="fas fa-clock"></span>
                                 </div>
                                 <div class="modfield2">
-                                    <input type="date" v-model="endDate" id="endDate" @change="this.getTasks(this.startDate,this.endDate)">
+                                    <input type="date" v-model="endDate" id="endDate" @change="this.getTasks(this.startDate,this.endDate,this.phoneNumber ,this.resName)">
                                     <span class="fas fa-clock"></span>
                                 </div>
                             </div>
@@ -90,7 +90,7 @@
                     </div>
                 </div>
                 <div v-else-if="selectedContent === 'dept'" class="table-container">
-                    <DeptVue />
+                    <DeptVue @view-booking="handleViewBooking"/>
                 </div>
                 <div v-else-if="selectedContent === 'doc'" class="table-container">
                     <DoctorVue />
@@ -114,6 +114,7 @@ export default {
         DeptVue,
         DoctorVue
     },
+    // props: ['resoName', 'selectedContent2'],
     data() {
         return {
             isAuthenticated: false,
@@ -130,6 +131,7 @@ export default {
             phoneNumber:'',
             startDate: '',
             endDate: '',
+            resName: '',
             isHovered: false,
             hoveredEvents:'',
             Id: '',
@@ -176,7 +178,14 @@ export default {
                 this.startDate = todayUTC;
                 this.endDate = todayUTC;
             }
-            await this.getTasks(this.startDate, this.endDate, this.phoneNumber);
+            // if(this.resoName !== ''){
+            //     this.resName = this.resoName;
+            //     console.log("reached name", this.resName);
+            // }
+            // if(this.selectedContent2 !== ''){
+            //     this.selectedContent = this.selectedContent2;
+            // }
+            await this.getTasks(this.startDate, this.endDate, this.phoneNumber, this.resName);
         } catch (error) {
             console.error("errrr",error);
         }
@@ -245,11 +254,14 @@ export default {
         //         console.error("errrr",error);
         //     }
         // },
-        async getTasks(startDate, endDate, no=''){
+        async getTasks(startDate, endDate, no='', resiName=''){
             try {
                 let url = `http://localhost:3000/api/get-bookings/?startDate=${startDate}&endDate=${endDate}`;
                 if(no != ''){
                     url += `&phone_no=${no}`;
+                }
+                if(resiName != ''){
+                    url += `&resource=${resiName}`;
                 }
                 const response = await axios.get(url, {  withCredentials: true });
                 const userData = response.data;
@@ -304,6 +316,12 @@ export default {
         handleFormSubmitted() {
             this.showT = false
             console.log("Submitted")
+        },
+        async handleViewBooking(Id){
+            console.log("recieved id: ", Id);
+            this.resName = Id;
+            this.selectedContent = 'home';
+            await this.getTasks(this.startDate, this.endDate, this.phoneNumber, this.resName);
         },
     }
 }

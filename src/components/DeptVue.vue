@@ -26,10 +26,10 @@
                         <input type="text" v-model="descriptionS" id="descriptionS" placeholder="Description">
                         <span class="fas fa-info-circle"></span>
                     </div>
-                    <div class="modfield">
+                    <!-- <div class="modfield">
                         <input type="text" v-model="addResourcesS" id="addResourcesS" placeholder="Add Resources">
                         <span class="fas fa-phone"></span>
-                    </div>
+                    </div> -->
                     <!-- <div class="modfield">
                         <input type="time" v-model="times" id="times" placeholder="Time">
                         <span class="fas fa-clock"></span>
@@ -85,15 +85,17 @@
                     <div>
                         <button class="createEvent common" @click="showAdd(service)" style="background-color: black;color: aliceblue; font-weight: 400;font-size: 1rem; padding: 7px 15px;">Add Resource</button>
                         <button class="btn-edit common" @click="showEdit(service)"><span class="fas fa-edit" style="color: blue;"></span></button>
-                        <button class="btn-delete common" @click=""><span class="fas fa-trash" style="color: red;"></span></button>
+                        <button class="btn-delete common" @click="deleteService(service.id)"><span class="fas fa-trash" style="color: red;"></span></button>
                     </div>
                 </div>
-                <div v-if="isToggle && service.id === serviceId" class="inner-res" v-for="name in displayList">
-                    <div>
-                        <div style="font-size: 1rem;font-weight: 500;" class="service-title">{{name}}</div>
-                    </div>
-                    <div>
-                        <button class="createEvent common" @click="" style="background-color: black;color: aliceblue; font-weight: 400;font-size: 0.85rem; padding: 5px 10px; margin-bottom: 5px;">View Bookings</button>
+                <div v-if="isToggle && service.id === serviceId">
+                    <div class="inner-res" v-for="name in displayList">
+                        <div>
+                            <div style="font-size: 1rem;font-weight: 500;" class="service-title">{{name}}</div>
+                        </div>
+                        <div>
+                            <button class="createEvent common" @click="navToBookings(name)" style="background-color: #2e7efa;color: aliceblue; font-weight: 400;font-size: 0.85rem; padding: 5px 10px;">View Bookings</button>
+                        </div>
                     </div>
                 </div>
                 
@@ -134,6 +136,7 @@ export default {
                 isToggle: false,
                 show: false,
                 times: '',
+                resoName: '',
             }
         },
         async mounted(){
@@ -261,14 +264,14 @@ export default {
             async editSer(Id){
                 // console.log(this.title);
                 // this.resources.push(this.title);
-                this.addResourcesS = this.addResourcesS.split(',');
-                console.log(this.addResourcesS);
+                // this.addResourcesS = this.addResourcesS.split(',');
+                // console.log(this.addResourcesS);
                 try {
                     //this.resources.push(this.title);
                     const response3 = await axios.put(`http://localhost:3000/api/edit-service/${Id}`,{
                         name: this.titleS,
                         description: this.descriptionS,
-                        resources: this.addResourcesS,
+                        // resources: this.addResourcesS,
                     }, { withCredentials: true });
                     const userData3 = response3.data;
                     console.log(userData3);
@@ -333,7 +336,30 @@ export default {
                     console.error("errrr", error);
                 }
             },
-
+            async deleteService(Id){
+                try {
+                    const response = await axios.delete(`http://localhost:3000/api/delete-service/${Id}`, { withCredentials: true });
+                    const userData = response.data;
+                    console.log(userData);
+                    this.triggerToast("Service Deleted!!");
+                } catch (error) {
+                    console.error("errrr", error);
+                }
+                await this.getServices();
+            },
+            async navToBookings(Id){
+                try {
+                    const propsData = {
+                        resoName: Id,
+                        selectedContent2: 'home',
+                    };
+                    //this.$router.push({ name: 'AdhomeVue', props: propsData });
+                    console.log('working nav',Id);
+                    this.$emit('view-booking', Id);
+                } catch (error) {
+                    console.error("errrr", error);
+                }
+            },
         },
     }
 </script>
@@ -493,14 +519,20 @@ export default {
     flex-wrap: nowrap;
     flex-direction: row;
     justify-content: space-between;
-    margin: 3px 25px;
-    border-bottom: 2px solid white;
+    align-items: center;
+    margin: 0 25px;
+    border-bottom: 1px solid white;
     padding: 5px 20px;
-    padding-bottom: 0;
+    /* padding-bottom: 0; */
+    background-color: rgb(100, 100, 100);;
+    color: white;
     /* width: 100%; */
 }
 .inner-res:nth-child(2) {
     border-top: 2px solid white;
+}
+.inner-res:hover{
+    background-color: rgb(61, 61, 61);
 }
 
 /* .body-single:nth-child(2) {

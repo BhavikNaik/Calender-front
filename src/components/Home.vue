@@ -498,8 +498,35 @@ export default {
     text-shadow: 0.5px 0 1px beige;
 }
 
+.modfieldT{
+  height: 80px;
+  width: 100%;
+  min-width: 270px;
+  display: flex;
+  /* justify-content: center; */
+  flex-direction: column;
+  align-items: center;
+  /* position: relative; */
+  margin: 10px 0 10px 0;
+}
+
+.modfieldT textarea{
+    flex: 1;
+  height: 100%;
+  width: 100%;
+  padding: 0.6rem 1rem ;
+  outline: none;
+  border: none;
+  font-size: 15px;
+  background: #faf3f3;
+  color: #595959;
+  border-radius: 7px;
+  box-shadow: inset 2px 2px 5px #f9efef,
+              inset -5px -5px 10px #ffffff73;
+}
+
 .modfield{
-  height: 40px;
+  height: 35px;
   width: 100%;
   min-width: 270px;
   display: flex;
@@ -514,7 +541,7 @@ export default {
   padding-left: 3rem;
   outline: none;
   border: none;
-  font-size: 15px;
+  font-size: 14px;
   background: #faf3f3;
   color: #595959;
   border-radius: 7px;

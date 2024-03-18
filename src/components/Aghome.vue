@@ -33,7 +33,12 @@
         </div>
         <Teleport to="body" v-if="showT">
             <div class="maintoast">
-                <CreateTask @close="closeToast" @create-event="handleFormSubmitted" />
+                <CreateTask @close="closeToast" @create-task="handleFormSubmitted" />
+            </div>
+        </Teleport>
+        <Teleport to="body" v-if="showT2">
+            <div class="maintoast">
+                <EditTask :eventData="selectEvent" @close2="closeToast2" @edit-task="handleFormSubmitted2" />
             </div>
         </Teleport>
         <div v-if="isOpen" class="modal2">
@@ -213,6 +218,7 @@
 import CreateTask from './CreateTask.vue';
 import DeptVue from './DeptVue.vue';
 import DoctorVue from './DoctorVue.vue';
+import EditTask from './EditBooking.vue';
 import axios from 'axios';
 import { useToast } from 'vue-toastification';
 
@@ -220,12 +226,14 @@ export default {
     components: {
         CreateTask,
         DeptVue,
-        DoctorVue
+        DoctorVue,
+        EditTask
     },
     data() {
         return {
             isAuthenticated: false,
             showT: false,
+            showT2: false,
             isLarge: true,
             userId: '',
             isOpen: false,
@@ -385,6 +393,8 @@ export default {
             // this.selectEvent.start = this.dateTimeChangeFormat(this.selectEvent.start);
             // this.selectEvent.end = this.dateTimeChangeFormat(this.selectEvent.end);
             console.log(this.selectEvent);
+            this.showT2 = true;
+            this.$emit("store-edit", this.selectEvent);
             // let partss = this.selectEvent.startDate.split('-');
             // this.selectEvent.startDate = `${partss[2]}-${partss[1]}-${partss[0]}`;
 
@@ -417,7 +427,18 @@ export default {
             this.showT = false;
         },
         handleFormSubmitted() {
-            this.showT = false
+            this.showT = false;
+            console.log("Submitted")
+        },
+        showToast2() {
+            this.showT2 = true;
+            // this.$emit("store-edit", this.selectEvent);
+        },
+        closeToast2() {
+            this.showT2 = false;
+        },
+        handleFormSubmitted2() {
+            this.showT2 = false;
             console.log("Submitted")
         },
         async editEvent(Id) {

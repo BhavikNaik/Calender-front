@@ -15,10 +15,10 @@
                 <input type="text" v-model="description" id="description" placeholder="Description">
                 <span class="fas fa-info-circle"></span>
             </div>
-            <div class="modfield">
+            <!-- <div class="modfield">
                 <input type="text" v-model="addResources" id="addResources" placeholder="Add Resources">
                 <span class="fas fa-phone"></span>
-            </div>
+            </div> -->
             <!-- <div class="modfield">
                 <input type="time" v-model="times" id="times" placeholder="Time">
                 <span class="fas fa-clock"></span>
@@ -139,7 +139,7 @@ export default {
                 const response = await axios.post(`http://localhost:3000/api/add-service`,{
                         name: this.title,
                         description: this.description,
-                        addResources: this.addResources,
+                        // addResources: this.addResources,
 
                     }, { withCredentials: true });
                 console.log(response.data);

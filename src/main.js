@@ -35,7 +35,7 @@ const router = createRouter({
         { path: '/login', component: login, name: 'Login' },
         { path: '/home', component: HomeVue, meta: { requiresAuth: true }},
         { path: '/aghome', name: 'AghomeVue', component: AghomeVue, meta: { requiresAuth: true, role: 'Agent' }},
-        { path: '/adhome', name: 'AdhomeVue', component: AdhomeVue, meta: { requiresAuth: true, role: 'Admin' }},
+        { path: '/adhome', name: 'AdhomeVue', props: true, component: AdhomeVue, meta: { requiresAuth: true, role: 'Admin' }},
         { path: '/departments', name: 'DeptVue', component: DeptVue, meta: { requiresAuth: true, role: 'Admin' }},
         { path: '/doctors', name: 'DoctorVue', component: DoctorVue, meta: { requiresAuth: true, role: 'Admin' }},
         // meta: { requiresAuth: true }

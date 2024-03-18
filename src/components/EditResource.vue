@@ -1,32 +1,32 @@
 <template>
     <div class="toasti">
-        <form @submit.prevent="handleSubmit">
+        <form @submit.prevent="handleSubmit(eventData2.id)">
             <div class="topi">
                 <span class="norText">
-                    Creating Resource !!
+                    Updating Resource !!
                 </span>
                 <button class="closeSymbol" @click="close">&times;</button>
             </div>
             <div class="modfield">
-                <input type="text" v-model="title" id="title" placeholder="Name">
+                <input type="text" v-model="eventData2.title" id="title" placeholder="Title">
                 <span class="fas fa-tag"></span>
             </div>
             <div class="modfield">
-                <input type="text" v-model="description" id="description" placeholder="Description">
+                <input type="text" v-model="eventData2.description" id="description" placeholder="Description">
                 <span class="fas fa-info-circle"></span>
             </div>
             <div class="modfield">
-               <input type="text" v-model="mail" id="mail" placeholder="Email Id">
+               <input type="text" v-model="eventData2.email" id="mail" placeholder="Email Id">
                <span class="fas fa-envelope"></span>
             </div>
             <div class="modfield">
-              <input type="text" v-model="contactNo" id="contactNo" placeholder="Phone Number">
+              <input type="text" v-model="eventData2.phone_no" id="contactNo" placeholder="Phone Number">
               <span class="fas fa-phone"></span>
            </div>
-            <div class="modfield">
-                <input type="text" v-model="duration" id="duration" placeholder="Duration in Minutes">
+            <!-- <div class="modfield">
+                <input type="text" v-model="eventData2.duration" id="duration" placeholder="Duration in Minutes">
                 <span class="fas fa-clock"></span>
-            </div>
+            </div> -->
             <!-- <div class="modfield">
                 <input type="time" v-model="times" id="times" placeholder="Time">
                 <span class="fas fa-clock"></span>
@@ -41,6 +41,7 @@ import axios from 'axios';
 import { useToast } from 'vue-toastification';
 
 export default {
+    props: ['eventData2'],
     data() {
         return {
             title: '',
@@ -109,31 +110,31 @@ export default {
         // getEmail(){
         //     this.host = this.$cookies.get('email');
         // },
-        async handleSubmit() {
-            this.validateTitle();
+        async handleSubmit(Id) {
+            // this.validateTitle();
             //this.validateStartTime();
             // this.validateEndTime();
 
-            if (!this.titleError) {
-               alert('Title cannot be Empty !!');
-               return;
-            }
+            // if (!this.titleError) {
+            //    alert('Title cannot be Empty !!');
+            //    return;
+            // }
 
             // this.addEmail();
 
-            console.log('Form: ', this.title,"",this.description,"",this.mail,"",this.contactNo,"",this.duration);
+            console.log('Form: ', this.eventData2.title,"",this.eventData2.description,"",this.eventData2.email,"",this.eventData2.phone_no,"",this.eventData2.duration);
             try {
-                const response = await axios.post(`http://localhost:3000/api/add-resource`,{
-                    name: this.title,
-                    description: this.description,
-                    email: this.mail,
-                    phone_no: this.contactNo,
-                    duration: this.duration,
+                const response = await axios.put(`http://localhost:3000/api/edit-resource/${Id}`,{
+                    name: this.eventData2.title,
+                    description: this.eventData2.description,
+                    email: this.eventData2.email,
+                    phone_no: this.eventData2.phone_no,
+                    // duration: this.eventData2.duration,
 
                 }, { withCredentials: true });
                 console.log(response.data);
-                this.$emit('create-resource', response.data);
-                this.triggerToast("Resource Added Successfully !!");
+                this.$emit('edit-resource', response.data);
+                this.triggerToast("Resource Updated Successfully !!");
                 this.$emit('close');
             } catch (error) {
                 console.error('Error creating event:', error);
@@ -143,8 +144,6 @@ export default {
             this.$emit('close');
         }
     },
-
-
 }
 </script>
 

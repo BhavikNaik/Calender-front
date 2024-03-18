@@ -8,6 +8,11 @@
             <CreateResource @close="closeToast" @create-resource="handleFormSubmitted" />
         </div>
     </Teleport>
+    <Teleport to="body" v-if="showT3">
+        <div class="maintoast">
+            <EditResource :eventData2="selectedResource" @close="closeToast3" @edit-resource="handleFormSubmitted3" />
+        </div>
+    </Teleport>
     <Teleport to="body" v-if="showTime">
         <div class="maintoast">
             <div class="toasti">
@@ -80,13 +85,13 @@
                 <div class="head-single">BOOKINGS</div> -->
             </div>
             <div class="table-body-all" v-for="event in getResources" :key="event.id">
-                <div class="body-single">{{ event.title }}</div>
-                <div class="body-single">{{ event.description }}</div>
-                <div class="body-single">{{ event.email }}</div>
-                <div class="body-single">{{ event.phone_no }}</div>
+                <div class="body-single" @click="onEventClick(event)">{{ event.title }}</div>
+                <div class="body-single" @click="onEventClick(event)">{{ event.description }}</div>
+                <div class="body-single" @click="onEventClick(event)">{{ event.email }}</div>
+                <div class="body-single" @click="onEventClick(event)">{{ event.phone_no }}</div>
                 <div class="body-single">
                     <button class="btn-edit common" @click="showToast2(event)"><span class="fas fa-edit" style="color: blue;"></span></button>
-                    <button class="btn-delete common" @click=""><span class="fas fa-trash" style="color: red;"></span></button>
+                    <button class="btn-delete common" @click="deleteResource(event.id)"><span class="fas fa-trash" style="color: red;"></span></button>
                 </div>
                 <!-- <div class="body-single">{{ event.services }}</div> -->
                 <!-- <div class="body-single">{{ event.related_to }}</div> -->
@@ -102,10 +107,12 @@
 import axios from "axios";
 import CreateResource from "./CreateResource.vue";
 import { useToast } from 'vue-toastification';
+import EditResource from "./EditResource.vue";
 
     export default {
         components:{
             CreateResource,
+            EditResource
         },
         data() {
             return {
@@ -113,6 +120,7 @@ import { useToast } from 'vue-toastification';
                 hoveredEvents: null,
                 getResources: [],
                 showT: false,
+                showT3: false,
                 showTime: false,
                 daysOfWeek: ['monday', 'tuesday', 'wednesday', 'thursday', 'friday', 'saturday', 'sunday'],
                 schedule: {},
@@ -120,6 +128,7 @@ import { useToast } from 'vue-toastification';
                 endTimes: {},
                 selectedId: '',
                 selectedEvent: '',
+                selectedResource: [],
             }
         },
         async mounted(){
@@ -158,6 +167,16 @@ import { useToast } from 'vue-toastification';
             },
             handleFormSubmitted() {
                 this.showT = false;
+                console.log("Submitted");
+            },
+            showToast3() {
+                this.showT3 = true;
+            },
+            closeToast3() {
+                this.showT3 = false;
+            },
+            handleFormSubmitted3() {
+                this.showT3 = false;
                 console.log("Submitted");
             },
             showToast2(e) {
@@ -224,6 +243,18 @@ import { useToast } from 'vue-toastification';
                 // this.closeToast2();
                 // this.showToast2(e);
             },
+            onEventClick(event) {
+                this.selectedResource = event;
+                // this.selectEvent.start = this.dateTimeChangeFormat(this.selectEvent.start);
+                // this.selectEvent.end = this.dateTimeChangeFormat(this.selectEvent.end);
+                console.log(this.selectedResource);
+                this.showT3 = true;
+                //this.$emit("edit-resource", this.selectedResource);
+                // let partss = this.selectEvent.startDate.split('-');
+                // this.selectEvent.startDate = `${partss[2]}-${partss[1]}-${partss[0]}`;
+
+                //this.isOpen = true;
+            },
             async getAllResources() {
                 try {
                     const response = await axios.get(`http://localhost:3000/api/getAllResources`, { withCredentials: true });
@@ -241,6 +272,7 @@ import { useToast } from 'vue-toastification';
                             bookings: item.bookings,
                             services: item.services,
                             workingHours: item.workingHours,
+                            duration: item.duration,
                             id: item._id,
                         });
                     });
@@ -249,6 +281,16 @@ import { useToast } from 'vue-toastification';
                 } catch (error) {
                     console.error("errrr", error);
                 }
+            },
+            async deleteResource(Id){
+                try{
+                    const response = await axios.delete(`http://localhost:3000/api/delete-resource/${Id}`, { withCredentials: true });
+                    console.log(response.data);
+                    this.triggerToast("Resource Deleted!!");
+                }catch(e){
+                    console.log(e);
+                }
+                await this.getAllResources();
             },
         },
     }
